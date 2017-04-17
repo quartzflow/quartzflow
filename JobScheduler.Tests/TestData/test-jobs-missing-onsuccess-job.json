@@ -1,0 +1,33 @@
+﻿[
+    {
+        "JobName": "Job1",
+        "Description": "",
+        "Group": "SOD",
+        "RunSchedule": {
+            "RunAt": "Now+1",
+            "RunOn": {
+                "Days": "Mon, Tue, Wed, Thu, Fri,Sat,Sun",
+                "Calendar": ""
+            },
+            "Timezone": "",
+            "ExclusionCalendar": "AU_Public_Holidays"
+        },
+        "ExecutableName": "D:\\Source\\JobScheduler\\JobScheduler\\TestApp\\bin\\Debug\\TestApp.exe",
+        "Parameters": "success 300",
+        "Retries": 3,
+        "WarnAfter": 1,
+        "TerminateAfter": 0
+    },
+    {
+        "JobName": "Job3",
+        "Description":  "",
+        "Group": "SOD",
+        "ExecutableName": "D:\\Source\\JobScheduler\\JobScheduler\\TestApp\\bin\\Debug\\TestApp.exe",
+        "Parameters": "success 1000",
+        "RunOnSuccessOf": { "Group": "SOD", "JobName": "Job2" },
+        "RunOnFailureOf": "",
+        "RunOnCompletionOf": ""
+    }
+
+
+]

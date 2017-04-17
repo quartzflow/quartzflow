@@ -1,0 +1,25 @@
+﻿[
+    {
+        "JobName": "Job2",
+        "Description": "",
+        "Group": "SOD",
+        "ExecutableName": "D:\\Source\\JobScheduler\\JobScheduler\\TestApp\\bin\\Debug\\TestApp.exe",
+        "Parameters": "failure 1000",
+        "RunOnSuccessOf": "",
+        "RunOnFailureOf": "",
+        "RunOnCompletionOf": { "Group": "SOD", "JobName": "Job1" },
+        "Retries": 1
+    },
+    {
+        "JobName": "Job3",
+        "Description":  "",
+        "Group": "SOD",
+        "ExecutableName": "D:\\Source\\JobScheduler\\JobScheduler\\TestApp\\bin\\Debug\\TestApp.exe",
+        "Parameters": "success 1000",
+        "RunOnSuccessOf": { "Group": "SOD", "JobName": "Job2" },
+        "RunOnFailureOf": "",
+        "RunOnCompletionOf": ""
+    }
+
+
+]

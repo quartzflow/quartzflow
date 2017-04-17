@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Common.Logging;
+using JobScheduler.Listeners;
+using Quartz;
+using Quartz.Impl.Matchers;
+
+namespace JobScheduler.QuartzExtensions 
+{
+    public static class SchedulerExtensions
+    {
+        public static void AddJobAndCreateTriggers(this IScheduler scheduler, IJobDetail job)
+        {
+            if (job == null)
+                return;
+
+            if (job.RequiresTrigger())
+            {
+                var triggers = job.CreateTriggers();
+                scheduler.ScheduleJob(job, triggers, true);
+                LogManager.GetLogger<IScheduler>().Info(job.GetNextRunAtMessages(triggers));
+            }
+            else
+            {
+                scheduler.AddJob(job, true, true);
+            }
+        }
+
+        public static void SetupJobDependencies(this IScheduler scheduler, List<IJobDetail> jobs)
+        {
+            var myJobListener = CreateJobChainingJobListener(jobs);
+            scheduler.ListenerManager.AddJobListener(myJobListener, GroupMatcher<JobKey>.AnyGroup());
+        }
+
+        private static IJobListener CreateJobChainingJobListener(List<IJobDetail> jobs)
+        {
+            var myJobListener = new ConditionalJobChainingListener();
+
+            foreach (var job in jobs)
+            {
+                var predecessorJobKey = job.JobDataMap[Constants.FieldNames.RunOnSuccessOf];
+                if (predecessorJobKey != null)
+                {
+                    var predecessorJob = jobs.FirstOrDefault(j => j.Key.ToString() == predecessorJobKey.ToString());
+                    if (predecessorJob == null)
+                        throw new Exception($"Unable to find predecessor job '{predecessorJobKey}' for job '{job.Key}'");
+                    myJobListener.AddJobChainLink(predecessorJob.Key, JobResultCriteria.OnSuccess, job.Key);
+                }
+
+                predecessorJobKey = job.JobDataMap[Constants.FieldNames.RunOnFailureOf];
+                if (predecessorJobKey != null)
+                {
+                    var predecessorJob = jobs.FirstOrDefault(j => j.Key.ToString() == predecessorJobKey.ToString());
+                    if (predecessorJob == null)
+                        throw new Exception($"Unable to find predecessor job '{predecessorJobKey}' for job '{job.Key}'");
+                    myJobListener.AddJobChainLink(predecessorJob.Key, JobResultCriteria.OnFailure, job.Key);
+                }
+
+                predecessorJobKey = job.JobDataMap[Constants.FieldNames.RunOnCompletionOf];
+                if (predecessorJobKey != null)
+                {
+                    var predecessorJob = jobs.FirstOrDefault(j => j.Key.ToString() == predecessorJobKey.ToString());
+                    if (predecessorJob == null)
+                        throw new Exception($"Unable to find predecessor job '{predecessorJobKey}' for job '{job.Key}'");
+                    myJobListener.AddJobChainLink(predecessorJob.Key, JobResultCriteria.OnCompletion, job.Key);
+                }
+            }
+
+            return myJobListener;
+        }
+    }
+}

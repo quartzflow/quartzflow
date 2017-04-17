@@ -1,9 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
-using JobSchedulerConsole;
-using Quartz;
-using Quartz.Impl;
-using Quartz.Job;
+using JobScheduler;
 
 namespace JobSchedulerConsole
 {
@@ -13,41 +11,25 @@ namespace JobSchedulerConsole
         {
             try
             {
-                Common.Logging.LogManager.Adapter = new Common.Logging.Simple.ConsoleOutLoggerFactoryAdapter
-                {
-                    Level = Common.Logging.LogLevel.Info
-                };
+                var jobsReader = new StringReader(File.ReadAllText(SchedulerConfig.JobsFile));
+                var jobDefinitions = JobConfig.CreateJobDefinitions(jobsReader);
 
-                // Grab the Scheduler instance from the Factory 
-                IScheduler scheduler = StdSchedulerFactory.GetDefaultScheduler();
+                var conductor = new Conductor(jobDefinitions, 60000, 90000);
 
-                // and start it off
-                scheduler.Start();
+                conductor.JobsStillExecutingWarning += Conductor_JobsStillExecutingWarning;
+                conductor.JobsTerminated += Conductor_JobsTerminated;
 
-                // define the job and tie it to our HelloJob class
-                IJobDetail job = JobBuilder.Create<HelloJob>()
-                    .WithIdentity("job1", "group1")
-                    .Build();
+                var sr = new StringReader(File.ReadAllText(SchedulerConfig.CalendarsFile));
+                conductor.AddCalendarsToExcludeFromFullYear(sr);
 
-                // Trigger the job to run now, and then repeat every 10 seconds
-                ITrigger trigger = TriggerBuilder.Create()
-                    .WithIdentity("trigger1", "group1")
-                    .StartNow()
-                    .WithSimpleSchedule(x => x
-                        .WithIntervalInSeconds(10)
-                        .RepeatForever())
-                    .Build();
+                conductor.StartScheduler();
 
-                // Tell quartz to schedule the job using our trigger
-                scheduler.ScheduleJob(job, trigger);
+                // sleep to show what's happening
+                Thread.Sleep(TimeSpan.FromSeconds(600));
 
-                // some sleep to show what's happening
-                Thread.Sleep(TimeSpan.FromSeconds(60));
-
-                // and last shut down the scheduler when you are ready to close your program
-                scheduler.Shutdown();
+                conductor.StopScheduler();
             }
-            catch (SchedulerException se)
+            catch (Exception se)
             {
                 Console.WriteLine(se);
             }
@@ -55,5 +37,27 @@ namespace JobSchedulerConsole
             Console.WriteLine("Press any key to close the application");
             Console.ReadKey();
         }
+
+        static void Conductor_JobsTerminated(object sender, System.Collections.Generic.List<string> e)
+        {
+            foreach (var message in e)
+            {
+                Console.WriteLine("ERROR - " + message);
+            }
+        }
+
+        static void Conductor_JobsStillExecutingWarning(object sender, System.Collections.Generic.List<string> e)
+        {
+            foreach (var message in e)
+            {
+                Console.WriteLine("WARNING - " + message);    
+            }
+        }
+
+
+
+       
     }
+
+
 }
