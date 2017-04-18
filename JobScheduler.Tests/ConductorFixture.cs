@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Quartz;
 using Rhino.Mocks;
 using System.Threading;
+using JobScheduler.Calendars;
 using JobScheduler.Listeners;
 
 namespace JobScheduler.Tests
@@ -16,13 +17,16 @@ namespace JobScheduler.Tests
         private Conductor _conductor;
         private IScheduler _mockScheduler;
         private IProcessManager _mockProcessManager;
+        private List<ICalendar> _calendars;
 
         [SetUp]
         public void Setup()
         {
             _mockScheduler = MockRepository.GenerateMock<IScheduler>();
             _mockProcessManager = MockRepository.GenerateMock<IProcessManager>();
-            _conductor = new Conductor(new List<JobDefinition>(), 2000, 2000, _mockScheduler, _mockProcessManager);
+            _calendars = CustomCalendarFactory.CreateAnnualCalendarsWithSpecifiedDatesExcluded(
+                new List<CustomCalendarDefinition>() {new CustomCalendarDefinition() {CalendarName = "AU_Without_Public_Holidays", Action = "exclude", Dates = new [] {new DateTime(2017, 1, 1), }} });
+            _conductor = new Conductor(new List<JobDefinition>(), new List<ICalendar>(), 2000, 2000, _mockScheduler, _mockProcessManager);
         }
 
         [TearDown]
@@ -38,6 +42,7 @@ namespace JobScheduler.Tests
             StringReader sr = TestHelper.GetFileContents("test-jobs.json");
             var definitions = JobConfig.CreateJobDefinitions(sr);
 
+            _mockScheduler.Expect(s => s.AddCalendar(Arg<string>.Is.Equal("AU_Without_Public_Holidays"), Arg<ICalendar>.Is.NotNull, Arg<bool>.Is.Equal(true), Arg<bool>.Is.Equal(true)));
             _mockScheduler.Expect(s => s.ScheduleJob(null, null, true)).IgnoreArguments();
             _mockScheduler.Expect(s => s.AddJob(null, true, true)).IgnoreArguments().Repeat.Twice();
 
@@ -45,7 +50,7 @@ namespace JobScheduler.Tests
             _mockScheduler.Expect(s => s.ListenerManager).Return(mockListenerManager).Repeat.Twice();
             mockListenerManager.Expect(l => l.AddJobListener(Arg<ConditionalJobChainingListener>.Is.TypeOf, Arg<IMatcher<JobKey>>.Is.Anything));
             mockListenerManager.Expect(l => l.AddJobListener(Arg<ConsoleJobListener>.Is.TypeOf, Arg<IMatcher<JobKey>>.Is.Anything));
-            _conductor = new Conductor(definitions, 2000, 2000, _mockScheduler, _mockProcessManager);
+            _conductor = new Conductor(definitions, _calendars, 2000, 2000, _mockScheduler, _mockProcessManager);
 
             mockListenerManager.VerifyAllExpectations();
         }
@@ -67,17 +72,6 @@ namespace JobScheduler.Tests
             _conductor.StopScheduler();
             Assert.IsFalse(_conductor.IsWarningTimerRunning);
             Assert.IsFalse(_conductor.IsTerminationTimerRunning);
-        }
-
-        [Test]
-        public void AddCalendarsToExcludeFromFullYear_ForMultipleCalendars_WillAddSuccessfully()
-        {
-            var sr = TestHelper.GetFileContents("test-calendars.json");
-
-            _mockScheduler.Expect(s => s.AddCalendar(Arg<string>.Is.Equal("AU_Without_Public_Holidays"), Arg<ICalendar>.Is.NotNull, Arg<bool>.Is.Equal(true), Arg<bool>.Is.Equal(true)));
-            _mockScheduler.Expect(s => s.AddCalendar(Arg<string>.Is.Equal("NZ_Without_Public_Holidays"), Arg<ICalendar>.Is.NotNull, Arg<bool>.Is.Equal(true), Arg<bool>.Is.Equal(true)));
-
-            _conductor.AddCalendarsToExcludeFromFullYear(sr);
         }
 
         [Test]

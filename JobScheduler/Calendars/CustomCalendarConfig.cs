@@ -9,6 +9,12 @@ namespace JobScheduler.Calendars
 {
     public class CustomCalendarConfig
     {
+        public static List<CustomCalendarDefinition> CreateCalendarDefinitions(string filename)
+        {
+            var reader = new StringReader(File.ReadAllText(filename));
+            return CreateCalendarDefinitions(reader);
+        }
+
         public static List<CustomCalendarDefinition> CreateCalendarDefinitions(StringReader configReader)
         {
             string jsonConfig = configReader.ReadToEnd();   

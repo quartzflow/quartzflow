@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Timers;
 using Common.Logging;
-using JobScheduler.Calendars;
 using JobScheduler.Listeners;
 using JobScheduler.QuartzExtensions;
 using Quartz;
 using Quartz.Impl;
+using Quartz.Impl.Matchers;
 using Timer = System.Timers.Timer;
 
 namespace JobScheduler
@@ -27,10 +27,10 @@ namespace JobScheduler
    
         public bool IsTerminationTimerRunning => _terminationTimer.Enabled;
 
-        public Conductor(List<JobDefinition> jobDefinitions, double intervalToCheckForLongRunningJobsInMs, double intervalToCheckForJobsToTerminateInMs) : 
-            this(jobDefinitions, intervalToCheckForLongRunningJobsInMs, intervalToCheckForJobsToTerminateInMs, StdSchedulerFactory.GetDefaultScheduler(), new ProcessManager()) {}
+        public Conductor(List<JobDefinition> jobDefinitions, List<ICalendar> calendars, double intervalToCheckForLongRunningJobsInMs, double intervalToCheckForJobsToTerminateInMs) : 
+            this(jobDefinitions, calendars, intervalToCheckForLongRunningJobsInMs, intervalToCheckForJobsToTerminateInMs, StdSchedulerFactory.GetDefaultScheduler(), new ProcessManager()) {}
 
-        public Conductor(List<JobDefinition> jobDefinitions, double intervalToCheckForLongRunningJobsInMs, double intervalToCheckForJobsToTerminateInMs, 
+        public Conductor(List<JobDefinition> jobDefinitions, List<ICalendar> calendars, double intervalToCheckForLongRunningJobsInMs, double intervalToCheckForJobsToTerminateInMs, 
                             IScheduler scheduler, IProcessManager processManager)
         {
             _scheduler = scheduler;
@@ -45,9 +45,29 @@ namespace JobScheduler
 
             _processManager = processManager;
 
+            calendars.ForEach(c => _scheduler.AddCalendar(c.Description, c, true, true));
+
             AddJobsToScheduler(jobDefinitions);
 
             _logger = LogManager.GetLogger(GetType());
+        }
+
+        public void StartScheduler()
+        {
+            if (!_scheduler.IsStarted)
+                _scheduler.Start();
+
+            _warningTimer.Start();
+            _terminationTimer.Start();
+        }
+
+        public void StopScheduler()
+        {
+            _terminationTimer.Stop();
+            _warningTimer.Stop();
+
+            if (!_scheduler.IsShutdown)
+                _scheduler.Shutdown();
         }
 
         void WarningTimerElapsed(object sender, ElapsedEventArgs e)
@@ -129,13 +149,6 @@ namespace JobScheduler
 
         }
 
-        public void AddCalendarsToExcludeFromFullYear(StringReader sr)
-        {
-            List<CustomCalendarDefinition> calendarDefinitions = CustomCalendarConfig.CreateCalendarDefinitions(sr);
-            var customCalendars = CustomCalendarFactory.CreateAnnualCalendarsWithSpecifiedDatesExcluded(calendarDefinitions);
-            customCalendars.ForEach(c => _scheduler.AddCalendar(c.Description, c, true, true));
-        }
-
         private void AddJobsToScheduler(List<JobDefinition> jobDefinitions)
         {
             if (jobDefinitions == null || jobDefinitions.Count <= 0)
@@ -148,23 +161,7 @@ namespace JobScheduler
             _scheduler.ListenerManager.AddJobListener(new ConsoleJobListener());
         }
 
-        public void StartScheduler()
-        {
-            if (!_scheduler.IsStarted)
-                _scheduler.Start(); 
 
-            _warningTimer.Start();
-            _terminationTimer.Start();
-        }
-
-        public void StopScheduler()
-        {
-            _terminationTimer.Stop();
-            _warningTimer.Stop();
-
-            if (!_scheduler.IsShutdown)
-                _scheduler.Shutdown();
-        }
 
 
     }

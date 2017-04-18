@@ -16,6 +16,13 @@ namespace JobScheduler.Tests
         }
 
         [Test]
+        public void CreateJobDefinitions_ForValidConfigFromFile_WillProvideDefinitions()
+        {
+            var definitions = JobConfig.CreateJobDefinitions(Path.Combine(AppDomain.CurrentDomain.BaseDirectory + @"\TestData", "test-jobs.json"));
+            Assert.AreEqual(3, definitions.Count);
+        }
+
+        [Test]
         public void CreateJobDefinitions_ForJobWithMissingGroup_WillThrowException()
         {
             StringReader sr = TestHelper.GetFileContents("test-jobs-missing-group.json");

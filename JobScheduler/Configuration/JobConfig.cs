@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using Newtonsoft.Json;
 using Quartz.Util;
 
@@ -9,6 +10,12 @@ namespace JobScheduler
 {
     public class JobConfig
     {
+        public static List<JobDefinition> CreateJobDefinitions(string filename)
+        {
+            var jobsReader = new StringReader(File.ReadAllText(filename));
+            return CreateJobDefinitions(jobsReader);
+        }
+
         public static List<JobDefinition> CreateJobDefinitions(StringReader configReader)
         {
             string jsonConfig = configReader.ReadToEnd();   

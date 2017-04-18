@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobSchedulerConsole", "JobSchedulerConsole\JobSchedulerConsole.csproj", "{E42365F4-808A-445E-BDBE-74575B2AAD6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobSchedulerHost", "JobSchedulerConsole\JobSchedulerHost.csproj", "{E42365F4-808A-445E-BDBE-74575B2AAD6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobScheduler", "JobScheduler\JobScheduler.csproj", "{F034DE80-CE53-4ED6-9977-76BD6BFEFE92}"
 EndProject

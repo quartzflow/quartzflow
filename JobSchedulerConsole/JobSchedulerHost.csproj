@@ -7,8 +7,8 @@
     <ProjectGuid>{E42365F4-808A-445E-BDBE-74575B2AAD6C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JobSchedulerConsole</RootNamespace>
-    <AssemblyName>JobSchedulerConsole</AssemblyName>
+    <RootNamespace>JobSchedulerHost</RootNamespace>
+    <AssemblyName>JobSchedulerHost</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>JobSchedulerConsole.Program</StartupObject>
+    <StartupObject>JobSchedulerHost.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Common.Logging, Version=3.3.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
@@ -64,10 +64,15 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Topshelf, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Topshelf.4.0.3\lib\net452\Topshelf.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SchedulerHost.cs" />
+    <Compile Include="SchedulerInteractor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
