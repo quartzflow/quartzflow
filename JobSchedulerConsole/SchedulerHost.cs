@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using JobScheduler;
 using JobScheduler.Calendars;
+using JobSchedulerHost.HttpApi;
+using Microsoft.Owin.Hosting;
+using Nancy.Bootstrapper;
+using Nancy.TinyIoc;
+using Quartz.Impl;
 
 namespace JobSchedulerHost
 {
@@ -23,6 +28,7 @@ namespace JobSchedulerHost
             _conductor.JobsStillExecutingWarning += Conductor_JobsStillExecutingWarning;
             _conductor.JobsTerminated += Conductor_JobsTerminated;
             _conductor.StartScheduler();
+            WebApp.Start<NancyStartup>("http://+:5000");
         }
 
         public void Stop()

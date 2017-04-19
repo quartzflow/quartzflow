@@ -21,7 +21,15 @@ Coming soon...
 
 ### Installing
 
-Coming soon...
+To reserve the specified URL for non-administrator users and accounts
+netsh http add urlacl url="http://+:5000/" user="Everyone"
+
+To remove the reservation
+netsh http delete urlacl url=http://+:5000/
+
+
+
+
 
 ## Running the tests
 
