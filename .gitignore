@@ -15,6 +15,10 @@ build/
 [Bb]in/
 [Oo]bj/
 
+# Cake Packages
+tools/*
+!tools/packages.config
+
 # NuGet Packages
 *.nupkg
 # The packages folder can be ignored because of Package Restore
@@ -27,6 +31,7 @@ build/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+[Tt]est[Rr]esult.*
 
 *_i.c
 *_p.c
