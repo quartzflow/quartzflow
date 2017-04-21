@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using System.Security.Principal;
 using Nancy;
 using Nancy.ModelBinding;
+using Nancy.Responses;
 
 namespace JobSchedulerHost.HttpApi
 {
@@ -12,13 +12,83 @@ namespace JobSchedulerHost.HttpApi
         {
             Get["/status"] = _ => interactor.GetStatus();
 
-            Get["/jobs"] = _ => Response.AsJson(interactor.GetJobNames());
-
-            Get["/job/{name}"] = parameters =>
+            Get["/jobs"] = _ =>
             {
+                var requestModel = this.Bind<SearchCriteriaModel>();
+
+                if (requestModel.Criteria == null)
+                {
+                    return Response.AsJson(interactor.GetJobNames());
+                }
+                if (requestModel.Criteria.ToLower() == "executing")
+                {
+                    return Response.AsJson(interactor.GetCurrentlyExecutingJobs());
+                }
+                return HttpStatusCode.NotFound;
+            };
+
+            Get["/jobs/{name}"] = parameters =>
+            {
+                if (!interactor.JobExists(parameters.name))
+                    return HttpStatusCode.NotFound;
+
                 JobDetailsModel result = interactor.GetJobDetails(parameters.name);
                 return Response.AsJson(result);
             };
+
+            Put["/jobs", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Pause] = _ =>
+            {
+                interactor.PauseAllJobs();
+                return HttpStatusCode.NoContent;
+            };
+
+            Put["/jobs", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Resume] = _ =>
+            {
+                interactor.ResumeAllJobs();
+                return HttpStatusCode.NoContent;
+            };
+
+            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Pause] = parameters =>
+            {
+                if (!interactor.JobExists(parameters.name))
+                    return HttpStatusCode.NotFound;
+
+                interactor.PauseJob(parameters.name);
+                return HttpStatusCode.NoContent;
+            };
+
+            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Resume] = parameters =>
+            {
+                if (!interactor.JobExists(parameters.name))
+                    return HttpStatusCode.NotFound;
+
+                interactor.ResumeJob(parameters.name);
+                return HttpStatusCode.NoContent;
+            };
+
+            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Start] = parameters =>
+            {
+                if (!interactor.JobExists(parameters.name))
+                    return HttpStatusCode.NotFound;
+
+                interactor.StartJob(parameters.name);
+                return HttpStatusCode.NoContent;
+            };
+
+            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Kill] = parameters =>
+                {
+                    if (!interactor.JobExists(parameters.name))
+                        return HttpStatusCode.NotFound;
+
+                    if (interactor.KillJob(parameters.name))
+                    {
+                        return HttpStatusCode.NoContent;
+                    }
+                    else
+                    {
+                        return new TextResponse(HttpStatusCode.BadRequest, $"Job '{parameters.name}' is not currently executing.");
+                    }
+                };
         }
 
         private IPrincipal GetUserPrincipal()

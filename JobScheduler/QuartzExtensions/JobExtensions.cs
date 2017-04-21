@@ -48,6 +48,9 @@ namespace JobScheduler.QuartzExtensions
                 }
             }
 
+            if (string.IsNullOrEmpty(runPlan))
+                runPlan = $"Job {job.Key} does not have a specific trigger";
+
             return runPlan;
         }
 

@@ -33,6 +33,12 @@ namespace JobScheduler.QuartzExtensions
             scheduler.ListenerManager.AddJobListener(myJobListener, GroupMatcher<JobKey>.AnyGroup());
         }
 
+        public static void KillJob(this IScheduler scheduler, IJobExecutionContext job, IProcessManager processManager)
+        {
+            int processId = (int)job.Get(Constants.FieldNames.ProcessId);
+            processManager.KillProcess(processId);
+        }
+
         private static IJobListener CreateJobChainingJobListener(List<IJobDetail> jobs)
         {
             var myJobListener = new ConditionalJobChainingListener();

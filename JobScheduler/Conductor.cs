@@ -133,8 +133,7 @@ namespace JobScheduler
                     double runTime = currentTime.Subtract(job.FireTimeUtc.Value.DateTime).TotalMinutes;
                     if (runTime > minutesToTerminateAfter)
                     {
-                        int processId = (int)job.Get(Constants.FieldNames.ProcessId);
-                        _processManager.KillProcess(processId);
+                        _scheduler.KillJob(job, _processManager);
                         terminatedJobs.Add($"Job {job.JobDetail.Key} was started at {job.FireTimeUtc.Value.ToLocalTime():G} and was killed after {runTime:F} minutes");
                     }
                 }
