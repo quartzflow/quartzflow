@@ -16,7 +16,7 @@ Task("Test")
     .Does(() =>
     {
         NUnit3("./JobScheduler.Tests/bin/Debug/JobScheduler.Tests.dll");
-		NUnit3("./JobSchedulerConsole.Tests/bin/Debug/JobSchedulerHost.Tests.dll");
+		NUnit3("./JobSchedulerHost.Tests/bin/Debug/JobSchedulerHost.Tests.dll");
     });
 
 RunTarget(target);

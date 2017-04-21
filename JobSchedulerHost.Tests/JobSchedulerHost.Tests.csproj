@@ -65,7 +65,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JobSchedulerConsole\JobSchedulerHost.csproj">
+    <ProjectReference Include="..\JobSchedulerHost\JobSchedulerHost.csproj">
       <Project>{e42365f4-808a-445e-bdbe-74575b2aad6c}</Project>
       <Name>JobSchedulerHost</Name>
     </ProjectReference>

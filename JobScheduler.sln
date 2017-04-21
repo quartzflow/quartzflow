@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobSchedulerHost", "JobSchedulerConsole\JobSchedulerHost.csproj", "{E42365F4-808A-445E-BDBE-74575B2AAD6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobSchedulerHost", "JobSchedulerHost\JobSchedulerHost.csproj", "{E42365F4-808A-445E-BDBE-74575B2AAD6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobScheduler", "JobScheduler\JobScheduler.csproj", "{F034DE80-CE53-4ED6-9977-76BD6BFEFE92}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Docs\Requirements.md = Docs\Requirements.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobSchedulerHost.Tests", "JobSchedulerConsole.Tests\JobSchedulerHost.Tests.csproj", "{2A2418C4-E5E7-496E-9DFC-9EB3A7549F9F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobSchedulerHost.Tests", "JobSchedulerHost.Tests\JobSchedulerHost.Tests.csproj", "{2A2418C4-E5E7-496E-9DFC-9EB3A7549F9F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
