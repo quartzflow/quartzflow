@@ -29,10 +29,17 @@ namespace JobSchedulerHost.HttpApi
     public class SchedulerInteractor : ISchedulerInteractor
     {
         private readonly IScheduler _scheduler;
+        private readonly IProcessManager _processManager;
 
         public SchedulerInteractor()
         {
             _scheduler = StdSchedulerFactory.GetDefaultScheduler();
+        }
+
+        public SchedulerInteractor(IScheduler scheduler, IProcessManager processManager)
+        {
+            _scheduler = scheduler;
+            _processManager = processManager;
         }
 
         public string GetStatus()
@@ -72,7 +79,7 @@ namespace JobSchedulerHost.HttpApi
                 foreach (var job in executingJobs)
                 {
                     TimeSpan jobRunTime = DateTime.UtcNow.Subtract(job.FireTimeUtc.Value.DateTime);
-                    jobDetails.Add($"Job {job.JobDetail.Key} was started at {job.FireTimeUtc.Value.LocalDateTime} and has been running for {jobRunTime.TotalSeconds} seconds");
+                    jobDetails.Add($"Job {job.JobDetail.Key} was started at {job.FireTimeUtc.Value.LocalDateTime} and has been running for {jobRunTime.TotalMinutes:0.00} minutes");
                 }
                 
             }
@@ -140,7 +147,7 @@ namespace JobSchedulerHost.HttpApi
 
             if (targetJob != null)
             {
-                _scheduler.KillJob(targetJob, new ProcessManager());
+                _scheduler.KillJob(targetJob, _processManager);
                 return true;
             }
             else
