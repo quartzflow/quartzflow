@@ -92,7 +92,7 @@ namespace JobScheduler.Tests
 
             _conductor.JobsStillExecutingWarning += (sender, e) => { returnValue = e; };
             _conductor.StartScheduler();
-            Thread.Sleep(7000);
+            Thread.Sleep(3000);
             _conductor.StopScheduler();
 
             Assert.That(returnValue.Count, NUnit.Framework.Is.Zero);
@@ -122,7 +122,7 @@ namespace JobScheduler.Tests
             var returnValue = new List<string>();
             _conductor.JobsStillExecutingWarning += (sender, e) => { returnValue = e; };
             _conductor.StartScheduler();
-            Thread.Sleep(7000);
+            Thread.Sleep(3000);
             _conductor.StopScheduler();
 
             var map = trigger2.JobDataMap;
@@ -159,7 +159,7 @@ namespace JobScheduler.Tests
             int warnings = 0;
             _conductor.JobsStillExecutingWarning += (sender, e) => { warnings++; };
             _conductor.StartScheduler();
-            Thread.Sleep(7000);
+            Thread.Sleep(3000);
             _conductor.StopScheduler();
 
             var map = trigger2.JobDataMap;
@@ -185,7 +185,7 @@ namespace JobScheduler.Tests
             int terminationNotices = 0;
             _conductor.JobsTerminated += (sender, e) => { terminationNotices++; };
             _conductor.StartScheduler();
-            Thread.Sleep(4000);
+            Thread.Sleep(3000);
             _conductor.StopScheduler();
 
             Assert.That(terminationNotices == 0);
@@ -209,7 +209,7 @@ namespace JobScheduler.Tests
             var returnValue = new List<string>();
             _conductor.JobsTerminated += (sender, e) => { returnValue = e; };
             _conductor.StartScheduler();
-            Thread.Sleep(7000);
+            Thread.Sleep(3000);
             _conductor.StopScheduler();
 
             Assert.That(returnValue.Count == 1);
