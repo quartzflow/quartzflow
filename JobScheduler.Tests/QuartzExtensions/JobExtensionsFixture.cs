@@ -145,6 +145,9 @@ namespace JobScheduler.Tests.QuartzExtensions
 
             var seedDate = DateTime.Now.Date;
 
+            if (DateTime.Now.DayOfWeek == DayOfWeek.Monday && (DateTime.UtcNow.TimeOfDay.CompareTo(new TimeSpan(9, 23, 00)) > 0))
+                seedDate = seedDate.AddDays(1);
+
             var dateOfNextMonday = GetDateForNextDayOfWeek(seedDate, DayOfWeek.Monday);
             var expectedMessage =
                 $"Job DEFAULT.Test will run at {dateOfNextMonday:D} 9:23:00 PM New Zealand Standard Time ({dateOfNextMonday:D} 7:23:00 PM AUS Eastern Standard Time)\r\n";

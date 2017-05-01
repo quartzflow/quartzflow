@@ -18,7 +18,7 @@ namespace JobSchedulerHost.Tests.HttpApi
     public class SchedulerInteractorFixture
     {
         private IScheduler _mockScheduler;
-        private ISchedulerInteractor _interactor;
+        private SchedulerInteractor _interactor;
         private IProcessManager _mockProcessManager;
 
         [SetUp]
@@ -69,7 +69,7 @@ namespace JobSchedulerHost.Tests.HttpApi
         {
             _mockScheduler.Expect(s => s.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()))
                 .Return(new Quartz.Collection.HashSet<JobKey>());
-            Assert.AreEqual(0, _interactor.GetJobNames().Count);
+            Assert.AreEqual(0, _interactor.GetJobs().Count);
         }
 
         [Test]
@@ -78,10 +78,24 @@ namespace JobSchedulerHost.Tests.HttpApi
             _mockScheduler.Expect(s => s.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()))
                 .Return(new Quartz.Collection.HashSet<JobKey>() {JobKey.Create("job1", "SOD"), JobKey.Create("job2", "SOD")});
 
-            var result = _interactor.GetJobNames();
+            IJobDetail job1 = GetMockJob("job1", "SOD");
+            IJobDetail job2 = GetMockJob("job2", "SOD");
+
+            var trigger = MockRepository.GenerateMock<ITrigger>();
+            trigger.Expect(t => t.GetNextFireTimeUtc()).Return(new DateTimeOffset(DateTime.UtcNow.AddMinutes(5))).Repeat.Twice();
+            var triggers = new List<ITrigger>() { trigger };
+
+            _mockScheduler.Expect(s => s.GetJobDetail(Arg<JobKey>.Is.TypeOf)).Return(job1).Repeat.Once();
+            _mockScheduler.Expect(s => s.GetJobDetail(Arg<JobKey>.Is.TypeOf)).Return(job2).Repeat.Once();
+            _mockScheduler.Expect(s => s.GetTriggersOfJob(Arg<JobKey>.Is.TypeOf)).Return(triggers).Repeat.Twice();
+
+            var result = _interactor.GetJobs();
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual("SOD.job1", result[0]);
-            Assert.AreEqual("SOD.job2", result[1]);
+            Assert.AreEqual("SOD.job1", result[0].Name);
+            Assert.AreEqual("SOD.job2", result[1].Name);
+
+            job1.VerifyAllExpectations();
+            job2.VerifyAllExpectations();
         }
 
         [Test]
@@ -112,10 +126,10 @@ namespace JobSchedulerHost.Tests.HttpApi
             Assert.AreEqual(2, result.Count);
 
             bool match1 = Regex.IsMatch(result[0],
-                @"Job DEFAULT.job1 was started at \d\d\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and has been running for \d.\d\d minutes");
+                @"Job DEFAULT.job1 was started at \d{1,2}\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and has been running for \d.\d\d minutes");
             Assert.IsTrue(match1);
             bool match2 = Regex.IsMatch(result[1],
-                @"Job DEFAULT.job2 was started at \d\d\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and has been running for \d.\d\d minutes");
+                @"Job DEFAULT.job2 was started at \d{1,2}\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and has been running for \d.\d\d minutes");
             Assert.IsTrue(match2);
 
             context1.VerifyAllExpectations();
@@ -125,12 +139,7 @@ namespace JobSchedulerHost.Tests.HttpApi
         [Test]
         public void GetJobDetails_ForExistingJob_ReturnsCorrectInfo()
         {
-            var job = MockRepository.GenerateMock<IJobDetail>();
-            job.Expect(j => j.JobDataMap).Return(new JobDataMap() {new KeyValuePair<string, object>("prop1", "something"), new KeyValuePair<string, object>("prop2", "something else") });
-
-            var key = JobKey.Create("job1", "SOD");
-            job.Expect(j => j.Key).Return(key).Repeat.Any();
-            job.Expect(j => j.Description).Return("this does something");
+            IJobDetail job = GetMockJob("job1", "SOD");
 
             var trigger = MockRepository.GenerateMock<ITrigger>();
             trigger.Expect(t => t.GetNextFireTimeUtc()).Return(new DateTimeOffset(DateTime.UtcNow.AddMinutes(5))).Repeat.Twice();
@@ -240,6 +249,18 @@ namespace JobSchedulerHost.Tests.HttpApi
             Assert.IsFalse(result);
             context1.VerifyAllExpectations();
             context2.VerifyAllExpectations();
+        }
+
+        private IJobDetail GetMockJob(string jobName, string groupName)
+        {
+            var job = MockRepository.GenerateMock<IJobDetail>();
+            job.Expect(j => j.JobDataMap).Return(new JobDataMap() { new KeyValuePair<string, object>("prop1", "something"), new KeyValuePair<string, object>("prop2", "something else") });
+
+            var key = JobKey.Create(jobName, groupName);
+            job.Expect(j => j.Key).Return(key).Repeat.Any();
+            job.Expect(j => j.Description).Return("this does something");
+
+            return job;
         }
     }
 }

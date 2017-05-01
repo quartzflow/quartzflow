@@ -49,7 +49,7 @@ namespace JobSchedulerHost.Tests.HttpApi
         [Test]
         public void Get_Jobs_WithNoCriteria_ReturnsResultAndOK()
         {
-            _interactor.Expect(i => i.GetJobNames()).Return(new List<string> {"job1", "job2"});
+            _interactor.Expect(i => i.GetJobs()).Return(new List<JobDetailsModel> { new JobDetailsModel() { Name = "job1" }, new JobDetailsModel { Name = "job2" } });
 
             var result = _browser.Get("/scheduler/jobs", with => {
                 with.HttpRequest();
@@ -57,10 +57,10 @@ namespace JobSchedulerHost.Tests.HttpApi
 
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
 
-            var resultList = JSON.ParseJSONValue<List<string>>(result.Body.AsString());
+            var resultList = JSON.ParseJSON<List<JobDetailsModel>>(result.Body.AsString());
             Assert.AreEqual(2, resultList.Count);
-            Assert.AreEqual("job1", resultList[0]);
-            Assert.AreEqual("job2", resultList[1]);
+            Assert.AreEqual("job1", resultList[0].Name);
+            Assert.AreEqual("job2", resultList[1].Name);
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace JobSchedulerHost.Tests.HttpApi
         [Test]
         public void Get_Jobs_ForInvalidCritieria_ReturnsNoResultAndNotFound()
         {
-            _interactor.Expect(i => i.GetJobNames()).Return(null).Repeat.Never();
+            _interactor.Expect(i => i.GetJobs()).Return(null).Repeat.Never();
             _interactor.Expect(i => i.GetCurrentlyExecutingJobs()).Return(null).Repeat.Never();
 
             var result = _browser.Get("/scheduler/jobs", with => {

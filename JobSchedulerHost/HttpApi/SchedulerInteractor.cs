@@ -14,9 +14,9 @@ namespace JobSchedulerHost.HttpApi
         //void Start();
         //void Stop();
         string GetStatus();
-        List<string> GetJobNames();
         List<string> GetCurrentlyExecutingJobs();
         JobDetailsModel GetJobDetails(string jobName);
+        List<JobDetailsModel> GetJobs();
         void PauseJob(string jobName);
         void PauseAllJobs();
         void ResumeJob(string jobName);
@@ -59,15 +59,18 @@ namespace JobSchedulerHost.HttpApi
             return "Undetermined";
         }
 
-        public List<string> GetJobNames()
+        public List<JobDetailsModel> GetJobs()
         {
-            var jobNames = new List<string>();
+            var jobList = new List<JobDetailsModel>();
             var allJobs = _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
             if (allJobs != null && allJobs.Count > 0)
             {
-                jobNames.AddRange(allJobs.Select(j => j.ToString()));
+                foreach (var job in allJobs)
+                {
+                    jobList.Add(GetJobDetails($"{job.Group}.{job.Name}"));
+                }
             }
-            return jobNames;
+            return jobList;
         }
 
         public List<string> GetCurrentlyExecutingJobs()

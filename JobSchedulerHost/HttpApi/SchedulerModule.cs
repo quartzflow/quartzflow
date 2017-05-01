@@ -10,6 +10,11 @@ namespace JobSchedulerHost.HttpApi
     {
         public SchedulerModule(ISchedulerInteractor interactor) : base("/scheduler")
         {
+            After.AddItemToEndOfPipeline((ctx) => ctx.Response
+                .WithHeader("Access-Control-Allow-Origin", "*")
+                .WithHeader("Access-Control-Allow-Methods", "PUT,POST,GET")
+                .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type"));
+
             Get["/status"] = _ => interactor.GetStatus();
 
             Get["/jobs"] = _ =>
@@ -18,7 +23,7 @@ namespace JobSchedulerHost.HttpApi
 
                 if (requestModel.Criteria == null)
                 {
-                    return Response.AsJson(interactor.GetJobNames());
+                    return Response.AsJson(interactor.GetJobs());
                 }
                 if (requestModel.Criteria.ToLower() == "executing")
                 {
