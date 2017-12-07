@@ -125,8 +125,10 @@ namespace JobScheduler.Tests.QuartzExtensions
                 seedDate = seedDate.AddDays(1);
 
             var dateOfNextMonday = GetDateForNextDayOfWeek(seedDate, DayOfWeek.Monday);
+            bool isInDaylightSavingTime = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time").IsDaylightSavingTime(dateOfNextMonday);
+            var mode = isInDaylightSavingTime ? "Daylight" : "Standard";
             var expectedMessage =
-                $"Job DEFAULT.Test will run at {dateOfNextMonday:D} 1:07:00 AM New Zealand Standard Time ({dateOfNextMonday.Subtract(new TimeSpan(1, 0, 0, 0)):D} 11:07:00 PM AUS Eastern Standard Time)\r\n";
+                $"Job DEFAULT.Test will run at {dateOfNextMonday:D} 1:07:00 AM New Zealand {mode} Time ({dateOfNextMonday.Subtract(new TimeSpan(1, 0, 0, 0)):D} 11:07:00 PM AUS Eastern {mode} Time)\r\n";
             Assert.AreEqual(expectedMessage, runMessage);
         }
 
@@ -149,8 +151,10 @@ namespace JobScheduler.Tests.QuartzExtensions
                 seedDate = seedDate.AddDays(1);
 
             var dateOfNextMonday = GetDateForNextDayOfWeek(seedDate, DayOfWeek.Monday);
+            bool isInDaylightSavingTime = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time").IsDaylightSavingTime(dateOfNextMonday);
+            var mode = isInDaylightSavingTime ? "Daylight" : "Standard";
             var expectedMessage =
-                $"Job DEFAULT.Test will run at {dateOfNextMonday:D} 9:23:00 PM New Zealand Standard Time ({dateOfNextMonday:D} 7:23:00 PM AUS Eastern Standard Time)\r\n";
+                $"Job DEFAULT.Test will run at {dateOfNextMonday:D} 9:23:00 PM New Zealand {mode} Time ({dateOfNextMonday:D} 7:23:00 PM AUS Eastern {mode} Time)\r\n";
             Assert.AreEqual(expectedMessage, runMessage);
         }
 
