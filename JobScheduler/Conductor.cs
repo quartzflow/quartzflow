@@ -157,7 +157,7 @@ namespace JobScheduler
             jobs.ForEach(j => _scheduler.AddJobAndCreateTriggers(j));
 
             _scheduler.SetupJobDependencies(jobs);
-            _scheduler.ListenerManager.AddJobListener(new ConsoleJobListener());
+            _scheduler.ListenerManager.AddJobListener(new ConsoleJobListener(), GroupMatcher<JobKey>.AnyGroup());
         }
 
 

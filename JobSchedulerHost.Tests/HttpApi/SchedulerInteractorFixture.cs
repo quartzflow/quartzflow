@@ -83,11 +83,13 @@ namespace JobSchedulerHost.Tests.HttpApi
 
             var trigger = MockRepository.GenerateMock<ITrigger>();
             trigger.Expect(t => t.GetNextFireTimeUtc()).Return(new DateTimeOffset(DateTime.UtcNow.AddMinutes(5))).Repeat.Twice();
+            trigger.Expect(t => t.Key).Return(new TriggerKey("someKey")).Repeat.Twice();
             var triggers = new List<ITrigger>() { trigger };
 
             _mockScheduler.Expect(s => s.GetJobDetail(Arg<JobKey>.Is.TypeOf)).Return(job1).Repeat.Once();
             _mockScheduler.Expect(s => s.GetJobDetail(Arg<JobKey>.Is.TypeOf)).Return(job2).Repeat.Once();
-            _mockScheduler.Expect(s => s.GetTriggersOfJob(Arg<JobKey>.Is.TypeOf)).Return(triggers).Repeat.Twice();
+            _mockScheduler.Expect(s => s.GetTriggersOfJob(Arg<JobKey>.Is.TypeOf)).Return(triggers).Repeat.Times(4);
+            _mockScheduler.Expect(s => s.GetTriggerState(Arg<TriggerKey>.Is.TypeOf)).Return(TriggerState.Normal).Repeat.Twice();
 
             var result = _interactor.GetJobs();
             Assert.AreEqual(2, result.Count);
@@ -109,14 +111,16 @@ namespace JobSchedulerHost.Tests.HttpApi
         [Test]
         public void GetCurrentlyExecutingJobs_ForPresentJobs_ReturnsNames()
         {
+            var job1StartTime = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 5));
             var context1 = MockRepository.GenerateMock<IJobExecutionContext>();
             context1.Expect(c => c.FireTimeUtc)
-                .Return(new DateTimeOffset(DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 5)))).Repeat.Twice();
+                .Return(new DateTimeOffset(job1StartTime)).Repeat.Twice();
             context1.Expect(c => c.JobDetail).Return(new JobDetailImpl("job1", typeof(NoOpJob)));
 
+            var job2StartTime = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 15));
             var context2 = MockRepository.GenerateMock<IJobExecutionContext>();
             context2.Expect(c => c.FireTimeUtc)
-                .Return(new DateTimeOffset(DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 5)))).Repeat.Twice();
+                .Return(new DateTimeOffset(job2StartTime)).Repeat.Twice();
             context2.Expect(c => c.JobDetail).Return(new JobDetailImpl("job2", typeof(NoOpJob)));
 
             _mockScheduler.Expect(s => s.GetCurrentlyExecutingJobs())
@@ -125,12 +129,10 @@ namespace JobSchedulerHost.Tests.HttpApi
             var result = _interactor.GetCurrentlyExecutingJobs();
             Assert.AreEqual(2, result.Count);
 
-            bool match1 = Regex.IsMatch(result[0],
-                @"Job DEFAULT.job1 was started at \d{1,2}\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and has been running for \d.\d\d minutes");
-            Assert.IsTrue(match1);
-            bool match2 = Regex.IsMatch(result[1],
-                @"Job DEFAULT.job2 was started at \d{1,2}\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and has been running for \d.\d\d minutes");
-            Assert.IsTrue(match2);
+            Assert.AreEqual(job1StartTime, result[0].StartedAt.ToUniversalTime());
+            Assert.AreEqual("DEFAULT.job1", result[0].Name);
+            Assert.AreEqual(job2StartTime, result[1].StartedAt.ToUniversalTime());
+            Assert.AreEqual("DEFAULT.job2", result[1].Name);
 
             context1.VerifyAllExpectations();
             context2.VerifyAllExpectations();
@@ -142,7 +144,8 @@ namespace JobSchedulerHost.Tests.HttpApi
             IJobDetail job = GetMockJob("job1", "SOD");
 
             var trigger = MockRepository.GenerateMock<ITrigger>();
-            trigger.Expect(t => t.GetNextFireTimeUtc()).Return(new DateTimeOffset(DateTime.UtcNow.AddMinutes(5))).Repeat.Twice();
+            DateTimeOffset triggerTime = new DateTimeOffset(DateTime.UtcNow.AddMinutes(5));
+            trigger.Expect(t => t.GetNextFireTimeUtc()).Return(triggerTime).Repeat.Twice();
             var triggers = new List<ITrigger>() {trigger};
             
             _mockScheduler.Expect(s => s.GetJobDetail(Arg<JobKey>.Is.TypeOf)).Return(job);
@@ -152,7 +155,7 @@ namespace JobSchedulerHost.Tests.HttpApi
 
             Assert.AreEqual("SOD.job1", result.Name);
             Assert.AreEqual("this does something", result.Description);
-            Assert.IsTrue(result.NextRunAt.StartsWith($"Job SOD.job1 will run at"));
+            Assert.IsTrue(result.NextRunAt.StartsWith(triggerTime.ToLocalTime().ToString("dddd, dd MMMM yyyy h:mm:ss tt")));
             Assert.AreEqual(2, result.Properties.Count);
             Assert.AreEqual("something", result.Properties.FirstOrDefault(p => p.Key == "prop1").Value);
             Assert.AreEqual("something else", result.Properties.FirstOrDefault(p => p.Key == "prop2").Value);

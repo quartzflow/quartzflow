@@ -188,3 +188,10 @@ $RECYCLE.BIN/
 # Visual Studio 2014 CTP
 **/*.sln.ide
 .vs/JobScheduler/v15/sqlite3/storage.ide
+.vs/JobScheduler/v15/Server/sqlite3/db.lock
+.vs/JobScheduler/v15/Server/sqlite3/storage.ide
+.vs/JobScheduler/v15/Server/sqlite3/storage.ide-shm
+.vs/JobScheduler/v15/Server/sqlite3/storage.ide-wal
+.vs/JobScheduler/v15/sqlite3/db.lock
+.vs/JobScheduler/v15/sqlite3/storage.ide-shm
+.vs/JobScheduler/v15/sqlite3/storage.ide-wal

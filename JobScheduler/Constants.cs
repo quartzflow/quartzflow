@@ -20,6 +20,7 @@
             public const string TerminateAfter = "TerminateAfter";
             public const string ProcessId = "ProcessId";
             public const string StandardOutput = "StandardOutput";
+            public const string JobId = "JobId";
 
             public const string HasIssuedLongRunningWarning = "HasIssuedLongRunningWarning";
         }

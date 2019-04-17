@@ -73,6 +73,7 @@
       <HintPath>..\packages\Quartz.2.6.1\lib\net40\Quartz.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -87,6 +88,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpApi\ActiveJobDetailsModel.cs" />
     <Compile Include="HttpApi\HttpApiConstants.cs" />
     <Compile Include="HttpApi\JobDetailsModel.cs" />
     <Compile Include="HttpApi\SchedulerModule.cs" />

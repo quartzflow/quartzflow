@@ -13,6 +13,7 @@ namespace JobScheduler.Tests.Jobs
     {
         private ConsoleJob _successJob;
         private ConsoleJob _failJob;
+        private ConsoleJob _errorExitCodeJob;
         private string _outputFile;
 
         [SetUp]
@@ -21,6 +22,7 @@ namespace JobScheduler.Tests.Jobs
             _outputFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.txt");
             SetupSuccessJob();
             SetupFailureJob();
+            SetupErrorExitCodeJob();
             File.Delete(_outputFile);
         }
 
@@ -94,6 +96,27 @@ namespace JobScheduler.Tests.Jobs
             Assert.AreEqual(JobExecutionStatus.Failed, context.Result);
         }
 
+        [Test]
+        public void Execute_OnErrorExitCodeAndWithinRetryAttempts_WillSetupForRetry()
+        {
+            var context = GetJobContext();
+
+            var exception = Assert.Throws<JobExecutionException>(() => _errorExitCodeJob.Execute(context));
+            Assert.AreEqual(true, exception.RefireImmediately);
+            Assert.AreEqual(JobExecutionStatus.Retrying, context.Result);
+        }
+
+        [Test]
+        public void Execute_OnErrorExitCodeAndAfterMaxRetriesExceeded_WillThrowExceptionAndFail()
+        {
+            var context = GetJobContext(2);
+
+            var exception = Assert.Throws<JobExecutionException>(() => _errorExitCodeJob.Execute(context));
+            Assert.AreEqual("Retries exceeded", exception.Message);
+            Assert.AreEqual(false, exception.RefireImmediately);
+            Assert.AreEqual(JobExecutionStatus.Failed, context.Result);
+        }
+
         private void SetupSuccessJob()
         {
             _successJob = new ConsoleJob
@@ -109,6 +132,17 @@ namespace JobScheduler.Tests.Jobs
             _failJob = new ConsoleJob
             {
                 ExecutableName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestApp\Missing.exe"),
+                OutputFile = _outputFile,
+                MaxRetries = 2
+            };
+        }
+
+        private void SetupErrorExitCodeJob()
+        {
+            _errorExitCodeJob = new ConsoleJob
+            {
+                ExecutableName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestApp\TestApp.exe"),
+                Parameters = "failure 1000",
                 OutputFile = _outputFile,
                 MaxRetries = 2
             };

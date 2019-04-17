@@ -14,7 +14,7 @@ namespace JobSchedulerHost.HttpApi
         //void Start();
         //void Stop();
         string GetStatus();
-        List<string> GetCurrentlyExecutingJobs();
+        List<ActiveJobDetailsModel> GetCurrentlyExecutingJobs();
         JobDetailsModel GetJobDetails(string jobName);
         List<JobDetailsModel> GetJobs();
         void PauseJob(string jobName);
@@ -24,6 +24,7 @@ namespace JobSchedulerHost.HttpApi
         void StartJob(string jobName);
         bool KillJob(string jobName);
         bool JobExists(string jobName);
+        string GetJobNameById(int jobId);
     }
 
     public class SchedulerInteractor : ISchedulerInteractor
@@ -34,6 +35,7 @@ namespace JobSchedulerHost.HttpApi
         public SchedulerInteractor()
         {
             _scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            _processManager = new ProcessManager();
         }
 
         public SchedulerInteractor(IScheduler scheduler, IProcessManager processManager)
@@ -73,21 +75,33 @@ namespace JobSchedulerHost.HttpApi
             return jobList;
         }
 
-        public List<string> GetCurrentlyExecutingJobs()
+        public List<ActiveJobDetailsModel> GetCurrentlyExecutingJobs()
         {
-            var jobDetails = new List<string>();
+            var activeJobList = new List<ActiveJobDetailsModel>();
             var executingJobs = _scheduler.GetCurrentlyExecutingJobs();
             if (executingJobs != null && executingJobs.Count > 0)
             {
-                foreach (var job in executingJobs)
+                foreach (var jobExecutionContext in executingJobs)
                 {
-                    TimeSpan jobRunTime = DateTime.UtcNow.Subtract(job.FireTimeUtc.Value.DateTime);
-                    jobDetails.Add($"Job {job.JobDetail.Key} was started at {job.FireTimeUtc.Value.LocalDateTime} and has been running for {jobRunTime.TotalMinutes:0.00} minutes");
+                    TimeSpan jobRunTime = DateTime.UtcNow.Subtract(jobExecutionContext.FireTimeUtc.Value.DateTime);
+                    //jobDetails.Add($"Job {jobExecutionContext.JobDetail.Key} was started at {jobExecutionContext.FireTimeUtc.Value.LocalDateTime} and has been running for {jobRunTime.TotalMinutes:0.00} minutes");
+      
+                    var activeJobDetails = new ActiveJobDetailsModel()
+                    {
+                        Id = jobExecutionContext.JobDetail.JobDataMap.GetInt(Constants.FieldNames.JobId),
+                        Name = jobExecutionContext.JobDetail.Key.ToString(),
+                        Description = jobExecutionContext.JobDetail.Description,
+                        StartedAt = jobExecutionContext.FireTimeUtc.Value.LocalDateTime,
+                        MinutesExecutingFor = jobRunTime.TotalMinutes,
+                        RetryCount = jobExecutionContext.RefireCount
+                    };
+
+                    activeJobList.Add(activeJobDetails);
                 }
                 
             }
 
-            return jobDetails;
+            return activeJobList;
         }
 
         public JobDetailsModel GetJobDetails(string jobName)
@@ -105,17 +119,33 @@ namespace JobSchedulerHost.HttpApi
                 props.Add(keyValuePair.Key, keyValuePair.Value?.ToString() ?? string.Empty);
             }
 
-            var jobTriggers = _scheduler.GetTriggersOfJob(key);
+            IList<ITrigger> jobTriggers = _scheduler.GetTriggersOfJob(job.Key);
 
             var result = new JobDetailsModel()
             {
+                Id = job.JobDataMap.GetInt(Constants.FieldNames.JobId),
                 Name = job.Key.ToString(),
                 Description = job.Description,
                 NextRunAt = job.GetNextRunAtMessages(new Quartz.Collection.HashSet<ITrigger>(jobTriggers)),
+                Status = _scheduler.GetJobStatus(job),
                 Properties = props
             };
 
             return result;
+        }
+
+        public string GetJobNameById(int jobId)
+        {
+            var keys = _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
+
+            foreach(var key in keys)
+            {
+                var job = _scheduler.GetJobDetail(key);
+                if (job.JobDataMap.GetInt(Constants.FieldNames.JobId) == jobId)
+                    return key.ToString();
+            }
+
+            return null;
         }
 
         public bool JobExists(string jobName)

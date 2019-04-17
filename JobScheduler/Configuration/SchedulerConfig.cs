@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Configuration;
 
 namespace JobScheduler
 {
@@ -13,6 +9,6 @@ namespace JobScheduler
 
         public static string CalendarsFile => Path.Combine(Directory.GetCurrentDirectory(), "Calendars.json");
 
-        public static string LogPath => @"d:\temp";
+        public static string LogPath => ConfigurationManager.AppSettings["LogPath"];
     }
 }

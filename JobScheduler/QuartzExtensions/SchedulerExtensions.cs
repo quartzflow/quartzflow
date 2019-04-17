@@ -75,5 +75,34 @@ namespace JobScheduler.QuartzExtensions
 
             return myJobListener;
         }
+
+        public static string GetJobStatus(this IScheduler scheduler, IJobDetail job)
+        {
+            IList<ITrigger> jobTriggers = scheduler.GetTriggersOfJob(job.Key);
+            var triggerStates = new List<TriggerState>();
+
+            foreach (ITrigger trigger in jobTriggers)
+            {
+                TriggerState state = scheduler.GetTriggerState(trigger.Key);
+                triggerStates.Add(state);
+            }
+
+            var distinctTriggerState = triggerStates.Distinct().Count();
+            var status = "Indeterminate";
+            switch (distinctTriggerState)
+            {
+                case 0:
+                    status = "Unscheduled";
+                    break;
+                case 1:
+                    status = triggerStates.First().ToString();
+                    break;
+                default:
+                    break;
+
+            }
+
+            return status;
+        }
     }
 }

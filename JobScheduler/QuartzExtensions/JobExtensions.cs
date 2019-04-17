@@ -39,17 +39,24 @@ namespace JobScheduler.QuartzExtensions
                         TimeZone.CurrentTimeZone.IsDaylightSavingTime(nextFireTimeInTargetTimeZone)
                             ? TimeZone.CurrentTimeZone.DaylightName
                             : TimeZone.CurrentTimeZone.StandardName;
-                    runPlan +=
-                        $"Job {job.Key} will run at {nextFireTimeInTargetTimeZone:F} {timeZoneName} ({nextFireTimeInLocalTimeZone:F} {localTimeZoneName}){Environment.NewLine}";
+
+                    if (timeZoneName != localTimeZoneName)
+                    {
+                        runPlan += $"{nextFireTimeInTargetTimeZone:F} {timeZoneName} ({nextFireTimeInLocalTimeZone:F} {localTimeZoneName}){Environment.NewLine}";
+                    }
+                    else
+                    {
+                        runPlan += $"{nextFireTimeInTargetTimeZone:F} {timeZoneName}{Environment.NewLine}";
+                    }                  
                 }
                 else
                 {
-                    runPlan = $"Job {job.Key} does not have a next run time set";
+                    runPlan = $"Job does not have a next run time set";
                 }
             }
 
             if (string.IsNullOrEmpty(runPlan))
-                runPlan = $"Job {job.Key} does not have a specific trigger";
+                runPlan = $"Job does not have a specific trigger";
 
             return runPlan;
         }

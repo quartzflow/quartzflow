@@ -55,8 +55,11 @@ namespace JobScheduler.Jobs
                 _output += consoleRunner.StandardOutput.ReadToEnd();
 
                 consoleRunner.WaitForExit();
-
-                context.Result = JobExecutionStatus.Succeeded;
+                
+                if (consoleRunner.ExitCode == 0)
+                    context.Result = JobExecutionStatus.Succeeded;
+                else
+                    throw new Exception("Process returned an error code");
             }
             //Only JobExecutionExceptions are expected from jobs
             catch (Exception ex)

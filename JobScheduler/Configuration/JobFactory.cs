@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using JobScheduler.Jobs;
 using Quartz;
@@ -10,6 +11,7 @@ namespace JobScheduler
         public static List<IJobDetail> CreateFromJobDefinitions(List<JobDefinition> jobDefinitions)
         {
             var actualJobs = new List<IJobDetail>();
+            int jobId = 1;
             foreach (var jobDefinition in jobDefinitions)
             {
                 IJobDetail job = JobBuilder.Create<ConsoleJob>()
@@ -18,6 +20,7 @@ namespace JobScheduler
                                             .StoreDurably(true)
                                             .Build();
 
+                job.JobDataMap[Constants.FieldNames.JobId] = jobId++;
                 job.JobDataMap[Constants.FieldNames.ExecutableName] = jobDefinition.ExecutableName;
                 job.JobDataMap[Constants.FieldNames.Parameters] = jobDefinition.Parameters;
                 job.JobDataMap[Constants.FieldNames.OutputFile] = Path.Combine(SchedulerConfig.LogPath, $"{jobDefinition.Group}-{jobDefinition.JobName}.txt");

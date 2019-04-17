@@ -32,12 +32,14 @@ namespace JobSchedulerHost.HttpApi
                 return HttpStatusCode.NotFound;
             };
 
-            Get["/jobs/{name}"] = parameters =>
+            Get["/jobs/{id}"] = parameters =>
             {
-                if (!interactor.JobExists(parameters.name))
+                var name = interactor.GetJobNameById(parameters.id);
+
+                if (string.IsNullOrEmpty(name))
                     return HttpStatusCode.NotFound;
 
-                JobDetailsModel result = interactor.GetJobDetails(parameters.name);
+                JobDetailsModel result = interactor.GetJobDetails(name);
                 return Response.AsJson(result);
             };
 
@@ -53,45 +55,53 @@ namespace JobSchedulerHost.HttpApi
                 return HttpStatusCode.NoContent;
             };
 
-            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Pause] = parameters =>
+            Put["/jobs/{id}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Pause] = parameters =>
             {
-                if (!interactor.JobExists(parameters.name))
+                var name = interactor.GetJobNameById(parameters.id);
+
+                if (string.IsNullOrEmpty(name))
                     return HttpStatusCode.NotFound;
 
-                interactor.PauseJob(parameters.name);
+                interactor.PauseJob(name);
                 return HttpStatusCode.NoContent;
             };
 
-            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Resume] = parameters =>
+            Put["/jobs/{id}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Resume] = parameters =>
             {
-                if (!interactor.JobExists(parameters.name))
+                var name = interactor.GetJobNameById(parameters.id);
+
+                if (string.IsNullOrEmpty(name))
                     return HttpStatusCode.NotFound;
 
-                interactor.ResumeJob(parameters.name);
+                interactor.ResumeJob(name);
                 return HttpStatusCode.NoContent;
             };
 
-            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Start] = parameters =>
+            Put["/jobs/{id}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Start] = parameters =>
             {
-                if (!interactor.JobExists(parameters.name))
+                var name = interactor.GetJobNameById(parameters.id);
+
+                if (string.IsNullOrEmpty(name))
                     return HttpStatusCode.NotFound;
 
-                interactor.StartJob(parameters.name);
+                interactor.StartJob(name);
                 return HttpStatusCode.NoContent;
             };
 
-            Put["/jobs/{name}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Kill] = parameters =>
+            Put["/jobs/{id}", ctx => ctx.Request.Form.ActionToTake.ToString().ToLower() == HttpApiConstants.JobAction.Kill] = parameters =>
                 {
-                    if (!interactor.JobExists(parameters.name))
+                    var name = interactor.GetJobNameById(parameters.id);
+
+                    if (string.IsNullOrEmpty(name))
                         return HttpStatusCode.NotFound;
 
-                    if (interactor.KillJob(parameters.name))
+                    if (interactor.KillJob(name))
                     {
                         return HttpStatusCode.NoContent;
                     }
                     else
                     {
-                        return new TextResponse(HttpStatusCode.BadRequest, $"Job '{parameters.name}' is not currently executing.");
+                        return new TextResponse(HttpStatusCode.BadRequest, $"Job '{name}' is not currently executing.");
                     }
                 };
         }

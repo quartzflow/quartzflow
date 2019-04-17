@@ -1,16 +1,20 @@
-﻿using Topshelf;
+﻿using System;
+using System.IO;
+using Topshelf;
 
 namespace JobSchedulerHost
 {
     public class Program
     {
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
             HostFactory.Run(x =>                                 
             {
                 x.Service<SchedulerHost>(s =>                        
                 {
-                    s.ConstructUsing(name => new SchedulerHost());     
+                    s.ConstructUsing(() => new SchedulerHost());     
                     s.WhenStarted(tc => tc.Start());              
                     s.WhenStopped(tc => tc.Stop());               
                 });
