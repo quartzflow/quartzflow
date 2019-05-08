@@ -86,13 +86,11 @@ namespace JobScheduler.Tests.Jobs
         }
 
         [Test]
-        public void Execute_AfterMaxRetriesExceeded_WillThrowExceptionAndFail()
+        public void Execute_AfterMaxRetriesExceeded_WillFail()
         {
-            var context = GetJobContext(2);
+            var context = GetJobContext(3);
 
-            var exception = Assert.Throws<JobExecutionException>(() => _failJob.Execute(context));
-            Assert.AreEqual("Retries exceeded", exception.Message);
-            Assert.AreEqual(false, exception.RefireImmediately);
+            _failJob.Execute(context);
             Assert.AreEqual(JobExecutionStatus.Failed, context.Result);
         }
 
@@ -109,11 +107,9 @@ namespace JobScheduler.Tests.Jobs
         [Test]
         public void Execute_OnErrorExitCodeAndAfterMaxRetriesExceeded_WillThrowExceptionAndFail()
         {
-            var context = GetJobContext(2);
+            var context = GetJobContext(3);
 
-            var exception = Assert.Throws<JobExecutionException>(() => _errorExitCodeJob.Execute(context));
-            Assert.AreEqual("Retries exceeded", exception.Message);
-            Assert.AreEqual(false, exception.RefireImmediately);
+            _errorExitCodeJob.Execute(context);
             Assert.AreEqual(JobExecutionStatus.Failed, context.Result);
         }
 

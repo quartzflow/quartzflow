@@ -26,45 +26,46 @@ namespace JobScheduler.Jobs
                 _jobKey = key.ToString();
                 JobDataMap dataMap = context.MergedJobDataMap;
 
-                if (MaxRetries > 0 && context.RefireCount >= MaxRetries)
+                if ((context.RefireCount > 0) && (context.RefireCount > MaxRetries))
                 {
-                    var e = new JobExecutionException("Retries exceeded") {RefireImmediately = false};
-                    //unschedule it so that it doesn't run again
+                    _output += $"No more retries available for job {key}.  Setting status to Failed.{Environment.NewLine}";
                     context.Result = JobExecutionStatus.Failed;
-                    throw e;
                 }
-
-                var consoleRunner = new Process
-                {
-                    StartInfo =
-                    {
-                        CreateNoWindow = false,
-                        FileName = ExecutableName,
-                        Arguments = Parameters,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true
-                    },
-                    EnableRaisingEvents = true,
-                };
-
-                _output = "-------------------------";
-                _output += $"About to run {key} at {DateTime.Now:dd/MM/yyyy HH:mm:ss.fff}{Environment.NewLine}";
-                _output += $"FileName: {ExecutableName}, Parameters: {Parameters}{Environment.NewLine}";
-
-                consoleRunner.Exited += ConsoleRunner_Exited;
-
-                consoleRunner.Start();
-
-                context.Put(Constants.FieldNames.ProcessId, consoleRunner.Id);
-                _output += consoleRunner.StandardOutput.ReadToEnd();
-
-                consoleRunner.WaitForExit();
-                
-                if (consoleRunner.ExitCode == 0)
-                    context.Result = JobExecutionStatus.Succeeded;
                 else
-                    throw new Exception("Process returned an error code");
+                {
+                    var consoleRunner = new Process
+                    {
+                        StartInfo =
+                        {
+                            CreateNoWindow = false,
+                            FileName = ExecutableName,
+                            Arguments = Parameters,
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true
+                        },
+                        EnableRaisingEvents = true,
+                    };
+
+                    _output += "--------------------------------------------------------------------------";
+                    _output += $"Attempt {context.RefireCount+1} of {MaxRetries+1}: About to run {key} at {DateTime.Now:dd/MM/yyyy HH:mm:ss.fff}{Environment.NewLine}";
+                    _output += $"FileName: {ExecutableName}, Parameters: {Parameters}{Environment.NewLine}";
+
+                    consoleRunner.Exited += ConsoleRunner_Exited;
+
+                    consoleRunner.Start();
+
+                    context.Put(Constants.FieldNames.ProcessId, consoleRunner.Id);
+                    _output += consoleRunner.StandardOutput.ReadToEnd();
+
+                    consoleRunner.WaitForExit();
+
+                    if (consoleRunner.ExitCode == 0)
+                        context.Result = JobExecutionStatus.Succeeded;
+                    else
+                        throw new Exception("Process returned an error code");
+
+                }
             }
             //Only JobExecutionExceptions are expected from jobs
             catch (Exception ex)
@@ -79,7 +80,7 @@ namespace JobScheduler.Jobs
 
                 if (retry)
                 {
-                    _output += $"Error executing job - {ex.Message}{Environment.NewLine}{ex.StackTrace}";
+                    _output += $"Error executing job - {ex.Message}{Environment.NewLine}{ex.StackTrace}{Environment.NewLine}";
                     context.Result = JobExecutionStatus.Retrying;
                 }
                 else
@@ -92,7 +93,8 @@ namespace JobScheduler.Jobs
             finally
             {
                 File.AppendAllText(OutputFile, _output);
-                context.Put(Constants.FieldNames.StandardOutput, _output);             
+                context.Put(Constants.FieldNames.StandardOutput, _output);  
+                _output = String.Empty;
             }
         }
 
