@@ -16,12 +16,14 @@ namespace JobScheduler.Jobs
         public int MaxRetries { get; set; }
 
         private string _output;
+        private string _jobKey;
 
         public void Execute(IJobExecutionContext context)
         {
             try
             {
                 JobKey key = context.JobDetail.Key;
+                _jobKey = key.ToString();
                 JobDataMap dataMap = context.MergedJobDataMap;
 
                 if (MaxRetries > 0 && context.RefireCount >= MaxRetries)
@@ -42,12 +44,15 @@ namespace JobScheduler.Jobs
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true
-                    }
+                    },
+                    EnableRaisingEvents = true,
                 };
 
                 _output = "-------------------------";
                 _output += $"About to run {key} at {DateTime.Now:dd/MM/yyyy HH:mm:ss.fff}{Environment.NewLine}";
                 _output += $"FileName: {ExecutableName}, Parameters: {Parameters}{Environment.NewLine}";
+
+                consoleRunner.Exited += ConsoleRunner_Exited;
 
                 consoleRunner.Start();
 
@@ -88,6 +93,16 @@ namespace JobScheduler.Jobs
             {
                 File.AppendAllText(OutputFile, _output);
                 context.Put(Constants.FieldNames.StandardOutput, _output);             
+            }
+        }
+
+        private void ConsoleRunner_Exited(object sender, EventArgs e)
+        {
+            Process job = (Process)sender;
+
+            if (job.ExitCode != 0)
+            {
+                _output += $"Exit event: Job {_jobKey} exited at {job.ExitTime.ToLongTimeString()} with an exit code of {job.ExitCode} {Environment.NewLine}";
             }
         }
     }
