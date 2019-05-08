@@ -155,7 +155,7 @@ namespace JobSchedulerHost.Tests.HttpApi
 
             Assert.AreEqual("SOD.job1", result.Name);
             Assert.AreEqual("this does something", result.Description);
-            Assert.IsTrue(result.NextRunAt.StartsWith(triggerTime.ToLocalTime().ToString("dddd, dd MMMM yyyy h:mm:ss tt")));
+            Assert.IsTrue(result.NextRunAt.StartsWith(triggerTime.ToLocalTime().ToString("dddd, d MMMM yyyy h:mm:ss tt")));
             Assert.AreEqual(2, result.Properties.Count);
             Assert.AreEqual("something", result.Properties.FirstOrDefault(p => p.Key == "prop1").Value);
             Assert.AreEqual("something else", result.Properties.FirstOrDefault(p => p.Key == "prop2").Value);
