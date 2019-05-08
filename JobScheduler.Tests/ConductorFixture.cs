@@ -129,10 +129,10 @@ namespace JobScheduler.Tests
             Assert.IsTrue((bool)map[Constants.FieldNames.HasIssuedLongRunningWarning]);
 
             Assert.That(returnValue.Count == 1);
-            Assert.AreEqual("a", returnValue[0]);
             bool match = Regex.IsMatch(returnValue[0],
-                @"Job DEFAULT.LateJob was started at \d{1,2}\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and is still running after \d+.\d\d minutes");
+                @"Job DEFAULT.LateJob was started at \d{1,2}\/\d{1,2}\/\d{4} \d+:\d\d:\d\d [AP]M and is still running after \d+.\d\d minutes");
             Assert.IsTrue(match);
+            Assert.AreEqual("a", returnValue[0]);
 
             jobContext1.VerifyAllExpectations();
             trigger1.VerifyAllExpectations();
@@ -215,9 +215,9 @@ namespace JobScheduler.Tests
 
             Assert.That(returnValue.Count == 1);
             bool match = Regex.IsMatch(returnValue[0],
-                @"Job DEFAULT.LateJob was started at \d{1,2}\/\d\d\/\d{4} \d+:\d\d:\d\d [AP]M and was killed after \d+.\d\d minutes");
-            Assert.AreEqual("a", returnValue[0]);
+                @"Job DEFAULT.LateJob was started at \d{1,2}\/\d{1,2}\/\d{4} \d+:\d\d:\d\d [AP]M and was killed after \d+.\d\d minutes");
             Assert.IsTrue(match);
+            Assert.AreEqual("a", returnValue[0]);
             jobContext1.VerifyAllExpectations();
         }
 
