@@ -41,8 +41,7 @@ namespace JobSchedulerHost
                 _conductor.JobsTerminated += Conductor_JobsTerminated;
                 _conductor.StartScheduler();
 
-                string portToUse = System.Configuration.ConfigurationManager.AppSettings["ApiPortToUse"];
-                WebApp.Start<NancyStartup>("http://+:" + portToUse);
+                WebApp.Start<NancyStartup>("http://+:" + SchedulerConfig.ApiPortToUse);
             }
             catch (Exception e)
             {

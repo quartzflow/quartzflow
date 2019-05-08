@@ -5,10 +5,12 @@ namespace JobScheduler
 {
     public static class SchedulerConfig
     {
-        public static string JobsFile => Path.Combine(Directory.GetCurrentDirectory(), "jobs.json");
+        public static string JobsFile => ConfigurationManager.AppSettings["JobsFile"];
 
-        public static string CalendarsFile => Path.Combine(Directory.GetCurrentDirectory(), "Calendars.json");
+        public static string CalendarsFile => ConfigurationManager.AppSettings["CalendarsFile"];
 
         public static string LogPath => ConfigurationManager.AppSettings["LogPath"];
+
+        public static string ApiPortToUse => ConfigurationManager.AppSettings["ApiPortToUse"];
     }
 }
