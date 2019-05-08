@@ -1,0 +1,19 @@
+﻿JobScheduler REST API 
+
+Base URL: /scheduler
+
+	GET /docs
+
+	GET /status
+		
+	GET /jobs[?criteria=executing]
+		
+	GET /jobs/{id}
+	
+	PUT /jobs    
+		(actiontotake = pause|resume)
+		Returns 204 (NoContent) on success
+	
+	PUT /jobs/{id}
+		(actiontotake = pause|resume|start|kill)
+		Returns 204 (NoContent) on success

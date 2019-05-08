@@ -269,6 +269,17 @@ namespace JobSchedulerHost.Tests.HttpApi
             Assert.IsTrue(string.IsNullOrEmpty(response.Body.AsString()));
         }
 
+        [Test]
+        public void Get_Docs_ReturnsResultAndOK()
+        {
+            var result = _browser.Get("/scheduler/docs", with => {
+                with.HttpRequest();
+            });
+
+            Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
+            Assert.IsTrue(result.Body.AsString().StartsWith("JobScheduler REST API \r\n\r\nBase URL: /scheduler"));
+        }
+
         private BrowserResponse SendJobActionRequest(int jobId, string action)
         {
             var result = _browser.Put($"/scheduler/jobs/{jobId}", with =>

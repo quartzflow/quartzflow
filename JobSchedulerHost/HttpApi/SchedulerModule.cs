@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Security.Principal;
 using Nancy;
 using Nancy.ModelBinding;
@@ -21,6 +24,8 @@ namespace JobSchedulerHost.HttpApi
                 .WithHeader("Access-Control-Allow-Origin", "*")
                 .WithHeader("Access-Control-Allow-Methods", "PUT,POST,GET")
                 .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type"));
+
+            Get["/docs"] = _ => Response.AsText(GetDocs());
 
             Get["/status"] = _ => interactor.GetStatus();
 
@@ -118,6 +123,21 @@ namespace JobSchedulerHost.HttpApi
             var env = ((IDictionary<string, object>) Context.Items["OWIN_REQUEST_ENVIRONMENT"]);
             var user = (IPrincipal) env["server.User"];
             return user;
+        }
+
+        private string GetDocs()
+        {
+            string result = string.Empty;
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = assembly.GetManifestResourceNames().Single(str => str.EndsWith("HttpApi.api-docs.txt"));
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                result = reader.ReadToEnd();
+            }
+
+            return result;
         }
     }
 }
