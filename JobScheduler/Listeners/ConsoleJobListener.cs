@@ -1,4 +1,5 @@
-﻿using Quartz;
+﻿using System;
+using Quartz;
 using Quartz.Listener;
 
 namespace JobScheduler.Listeners
@@ -17,7 +18,7 @@ namespace JobScheduler.Listeners
 
         public override void JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException)
         {
-            Log.Info("In Listener: " + context.Get(Constants.FieldNames.StandardOutput));
+            Log.Info("-----Execution log:" + Environment.NewLine + context.Get(Constants.FieldNames.StandardOutput));
             Log.Info("---------------------");
         }
 

@@ -79,7 +79,7 @@ namespace JobScheduler.Tests.Listeners
             _listener.JobWasExecuted(_context, null);
 
             var messages = _testLogger.GetLoggedMessages();
-            Assert.AreEqual($"In Listener: {programOutput}", messages[0].RenderedMessage);
+            Assert.AreEqual($"-----Execution log:\r\n{programOutput}", messages[0].RenderedMessage);
             Assert.AreEqual("---------------------", messages[1].RenderedMessage);
         }
 
