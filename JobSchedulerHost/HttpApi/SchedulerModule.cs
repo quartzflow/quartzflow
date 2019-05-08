@@ -8,8 +8,15 @@ namespace JobSchedulerHost.HttpApi
 {
     public class SchedulerModule : NancyModule
     {
-        public SchedulerModule(ISchedulerInteractor interactor) : base("/scheduler")
+        public SchedulerModule(ISchedulerInteractor interactor, ISchedulerAuthorisationProvider authorisationProvider) : base("/scheduler")
         {
+            Before.AddItemToStartOfPipeline((ctx) =>
+            {
+                //var isAuthorised = authorisationProvider.IsAuthorisedForOperation(ctx);
+                var isAuthorised = true;
+                return isAuthorised ? null : new Response { StatusCode = HttpStatusCode.Unauthorized };
+            });
+
             After.AddItemToEndOfPipeline((ctx) => ctx.Response
                 .WithHeader("Access-Control-Allow-Origin", "*")
                 .WithHeader("Access-Control-Allow-Methods", "PUT,POST,GET")

@@ -14,17 +14,23 @@ namespace JobSchedulerHost.Tests.HttpApi
     public class SchedulerModuleFixture
     {
         private ISchedulerInteractor _interactor;
+        private ISchedulerAuthorisationProvider _authorisationProvider;
         private Browser _browser;
 
         [SetUp]
         public void Setup()
         {
             _interactor = MockRepository.GenerateMock<ISchedulerInteractor>();
+            _authorisationProvider = MockRepository.GenerateMock<ISchedulerAuthorisationProvider>();
             _browser = new Browser(with =>
             {
                 with.Module<SchedulerModule>();
                 with.Dependency<ISchedulerInteractor>(_interactor);
+                with.Dependency<ISchedulerAuthorisationProvider>(_authorisationProvider);
             });
+
+            _authorisationProvider.Expect(i => i.IsAuthorisedForOperation(null))
+                                            .IgnoreArguments().Return(true).Repeat.Any();
         }
 
         [TearDown]

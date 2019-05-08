@@ -91,6 +91,7 @@
     <Compile Include="HttpApi\ActiveJobDetailsModel.cs" />
     <Compile Include="HttpApi\HttpApiConstants.cs" />
     <Compile Include="HttpApi\JobDetailsModel.cs" />
+    <Compile Include="HttpApi\SchedulerAuthorisationProvider.cs" />
     <Compile Include="HttpApi\SchedulerModule.cs" />
     <Compile Include="HttpApi\NancyStartup.cs" />
     <Compile Include="HttpApi\SearchCriteriaModel.cs" />
