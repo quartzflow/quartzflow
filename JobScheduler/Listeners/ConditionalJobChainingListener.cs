@@ -26,16 +26,16 @@ namespace JobScheduler.Listeners
 
     public class ConditionalJobChainingListener : JobListenerSupport
     {
-        private readonly IDictionary<JobKey, DependentJobDetails> _chainLinks;
+        private readonly List<Tuple<JobKey, DependentJobDetails>> _chainLinks;
 
         public override string Name => "ConditionalJobChainingListener";
 
         public ConditionalJobChainingListener()
         {
-            _chainLinks = new Dictionary<JobKey, DependentJobDetails>();
+            _chainLinks = new List<Tuple<JobKey, DependentJobDetails>>();
         }
 
-        public IDictionary<JobKey, DependentJobDetails> GetChainLinks()
+        public IList<Tuple<JobKey, DependentJobDetails>> GetChainLinks()
         {
             return _chainLinks;
         }
@@ -58,47 +58,52 @@ namespace JobScheduler.Listeners
                 throw new ArgumentException("Key cannot have a null name!");
             }
 
-            _chainLinks.Add(firstJob, new DependentJobDetails(firstJobResult, secondJob));
+            _chainLinks.Add(new Tuple<JobKey, DependentJobDetails>(firstJob, new DependentJobDetails(firstJobResult, secondJob)));
         }
 
         public override void JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException)
         {
-            DependentJobDetails sj;
-            _chainLinks.TryGetValue(context.JobDetail.Key, out sj);
+            var jobDependencies = _chainLinks.FindAll(l => Equals(l.Item1, context.JobDetail.Key));
 
-            if (sj == null)
+            if (jobDependencies == null || jobDependencies.Count == 0)
             {
                 return;
             }
 
             var predecessorJobStatus = (JobExecutionStatus)context.Result;
 
-            switch (sj.PredecessorJobResult)
+            foreach (var jobDependency in jobDependencies)
             {
-                case JobResultCriteria.OnCompletion:
-                    if (predecessorJobStatus != JobExecutionStatus.Retrying)
-                    {
-                        Log.Info($"Completion of Job '{context.JobDetail.Key}' will now trigger Job '{sj.DependentJobKey}'");
-                        TriggerDependentJob(context, sj);
-                    }
-                    break;
+                var jobDetails = jobDependency.Item2;
 
-                case JobResultCriteria.OnSuccess:
-                    if (predecessorJobStatus == JobExecutionStatus.Succeeded)
-                    {
-                        Log.Info($"Success of Job '{context.JobDetail.Key}' will now trigger Job '{sj.DependentJobKey}'");
-                        TriggerDependentJob(context, sj);
-                    }
-                    break;
+                switch (jobDetails.PredecessorJobResult)
+                {
+                    case JobResultCriteria.OnCompletion:
+                        if (predecessorJobStatus != JobExecutionStatus.Retrying)
+                        {
+                            Log.Info($"Completion of Job '{context.JobDetail.Key}' will now trigger Job '{jobDetails.DependentJobKey}'");
+                            TriggerDependentJob(context, jobDetails);
+                        }
+                        break;
 
-                case JobResultCriteria.OnFailure:
-                    if (predecessorJobStatus == JobExecutionStatus.Failed)
-                    {
-                        Log.Info($"Failure of Job '{context.JobDetail.Key}' will now trigger Job '{sj.DependentJobKey}'");
-                        TriggerDependentJob(context, sj);
-                    }
-                    break;
+                    case JobResultCriteria.OnSuccess:
+                        if (predecessorJobStatus == JobExecutionStatus.Succeeded)
+                        {
+                            Log.Info($"Success of Job '{context.JobDetail.Key}' will now trigger Job '{jobDetails.DependentJobKey}'");
+                            TriggerDependentJob(context, jobDetails);
+                        }
+                        break;
+
+                    case JobResultCriteria.OnFailure:
+                        if (predecessorJobStatus == JobExecutionStatus.Failed)
+                        {
+                            Log.Info($"Failure of Job '{context.JobDetail.Key}' will now trigger Job '{jobDetails.DependentJobKey}'");
+                            TriggerDependentJob(context, jobDetails);
+                        }
+                        break;
+                }
             }
+            
         }
 
         private void TriggerDependentJob(IJobExecutionContext context, DependentJobDetails sj)

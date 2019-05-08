@@ -53,7 +53,7 @@ namespace JobScheduler.Tests.Listeners
 
             _listener.JobToBeExecuted(_context);
 
-            _testLogger.AssertInfoMessageLogged($"-----About to run '{_context.JobDetail.Key}'");
+            _testLogger.AssertInfoMessagesLogged($"-----About to run '{_context.JobDetail.Key}'");
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace JobScheduler.Tests.Listeners
 
             _listener.JobExecutionVetoed(_context);
 
-            _testLogger.AssertInfoMessageLogged($"-----Run of '{_context.JobDetail.Key}' was vetoed!");
+            _testLogger.AssertInfoMessagesLogged($"-----Run of '{_context.JobDetail.Key}' was vetoed!");
         }
 
         [Test]

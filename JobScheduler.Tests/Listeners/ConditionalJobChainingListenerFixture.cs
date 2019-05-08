@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using JobScheduler.Listeners;
 using Quartz;
@@ -54,8 +55,8 @@ namespace JobScheduler.Tests.Listeners
 
             var links = _listener.GetChainLinks();
 
-            Assert.AreEqual(jobB, links[jobA].DependentJobKey);
-            Assert.AreEqual(resultCriteria, links[jobA].PredecessorJobResult);
+            Assert.AreEqual(jobB, links.First(l => Equals(l.Item1, jobA)).Item2.DependentJobKey);
+            Assert.AreEqual(resultCriteria, links.First(l => Equals(l.Item1, jobA)).Item2.PredecessorJobResult);
         }
 
         [Test]
@@ -91,8 +92,8 @@ namespace JobScheduler.Tests.Listeners
         {
             JobKey jobA = new JobKey("JobA");
 
-            _jobDetail.Expect(j => j.Key).Return(jobA);
-            _context.Expect(c => c.JobDetail).Return(_jobDetail);
+            _jobDetail.Expect(j => j.Key).IgnoreArguments().Repeat.Never();
+            _context.Expect(c => c.JobDetail).IgnoreArguments().Repeat.Never();
 
             _listener.JobWasExecuted(_context, null);
 
@@ -115,7 +116,30 @@ namespace JobScheduler.Tests.Listeners
             _listener.AddJobChainLink(jobA, JobResultCriteria.OnCompletion, jobB);
             _listener.JobWasExecuted(_context, null);
 
-            _testLogger.AssertInfoMessageLogged($"Completion of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobB.Name}'");
+            _testLogger.AssertInfoMessagesLogged($"Completion of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobB.Name}'");
+        }
+
+        [Test]
+        [TestCase(JobExecutionStatus.Succeeded)]
+        [TestCase(JobExecutionStatus.Failed)]
+        public void JobWasExecuted_ForOnCompletionTriggerAndCompletedState_WillTriggerNextJobs(JobExecutionStatus status)
+        {
+            JobKey jobA = new JobKey("JobA");
+            JobKey jobB = new JobKey("JobB");
+            JobKey jobC = new JobKey("JobC");
+
+            _jobDetail.Expect(j => j.Key).Return(jobA);
+            _context.Expect(c => c.JobDetail).Return(_jobDetail);
+            _context.Expect(c => c.Result).Return(status);
+            _context.Scheduler.Expect(s => s.TriggerJob(jobB));
+            _context.Scheduler.Expect(s => s.TriggerJob(jobC));
+
+            _listener.AddJobChainLink(jobA, JobResultCriteria.OnCompletion, jobB);
+            _listener.AddJobChainLink(jobA, JobResultCriteria.OnCompletion, jobC);
+            _listener.JobWasExecuted(_context, null);
+
+            _testLogger.AssertInfoMessagesLogged($"Completion of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobB.Name}'",
+                                                 $"Completion of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobC.Name}'");
         }
 
         [Test]
@@ -148,7 +172,7 @@ namespace JobScheduler.Tests.Listeners
             _listener.AddJobChainLink(jobA, JobResultCriteria.OnSuccess, jobB);
             _listener.JobWasExecuted(_context, null);
 
-            _testLogger.AssertInfoMessageLogged($"Success of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobB.Name}'");
+            _testLogger.AssertInfoMessagesLogged($"Success of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobB.Name}'");
         }
 
         [Test]
@@ -207,7 +231,7 @@ namespace JobScheduler.Tests.Listeners
             _listener.AddJobChainLink(jobA, JobResultCriteria.OnFailure, jobB);
             _listener.JobWasExecuted(_context, null);
 
-            _testLogger.AssertInfoMessageLogged($"Failure of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobB.Name}'");
+            _testLogger.AssertInfoMessagesLogged($"Failure of Job 'DEFAULT.{jobA.Name}' will now trigger Job 'DEFAULT.{jobB.Name}'");
         }
 
         [Test]

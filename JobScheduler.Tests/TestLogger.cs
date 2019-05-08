@@ -22,12 +22,17 @@ namespace JobScheduler.Tests
             return _loggingAdapter.LoggerEvents;
         }
 
-        public void AssertInfoMessageLogged(string message)
+        public void AssertInfoMessagesLogged(params string[] messages)
         {
-            var messages = GetLoggedMessages();
-            Assert.AreEqual(1, messages.Count);
-            Assert.AreEqual(LogLevel.Info, messages[0].Level);
-            Assert.AreEqual(message, messages[0].RenderedMessage);
+            var loggedMessages = GetLoggedMessages();
+            Assert.AreEqual(messages.Length, loggedMessages.Count);
+
+            int i = 0;
+            foreach (var loggedMessage in loggedMessages)
+            {
+                Assert.AreEqual(LogLevel.Info, loggedMessage.Level);
+                Assert.AreEqual(messages[i++], loggedMessage.RenderedMessage);
+            }
         }
 
         public void AssertNoMessagesLogged()
