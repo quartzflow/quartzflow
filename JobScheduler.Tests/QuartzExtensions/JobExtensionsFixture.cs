@@ -125,10 +125,18 @@ namespace JobScheduler.Tests.QuartzExtensions
                 seedDate = seedDate.AddDays(1);
 
             var dateOfNextMonday = GetDateForNextDayOfWeek(seedDate, DayOfWeek.Monday);
-            bool isInDaylightSavingTime = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time").IsDaylightSavingTime(dateOfNextMonday);
-            var mode = isInDaylightSavingTime ? "Daylight" : "Standard";
+
+            var nzTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
+            var timeSpanDifference = nzTimeZoneInfo.BaseUtcOffset - TimeZoneInfo.Local.BaseUtcOffset;
+            var expectedLocalTime = dateOfNextMonday.AddHours(1).AddMinutes(7).Subtract(timeSpanDifference);
+
+            bool isInDaylightSavingTime = nzTimeZoneInfo.IsDaylightSavingTime(dateOfNextMonday);
+            var nzTimeZoneName = isInDaylightSavingTime ? nzTimeZoneInfo.DaylightName : nzTimeZoneInfo.StandardName;
+
+            bool isLocalInDaylightSavingTime = TimeZoneInfo.Local.IsDaylightSavingTime(dateOfNextMonday);
+            var localTimeZoneName = isLocalInDaylightSavingTime ? TimeZoneInfo.Local.DaylightName : TimeZoneInfo.Local.StandardName;
             var expectedMessage =
-                $"{dateOfNextMonday:D} 1:07:00 AM New Zealand {mode} Time ({dateOfNextMonday.Subtract(new TimeSpan(1, 0, 0, 0)):D} 11:07:00 PM AUS Eastern {mode} Time)\r\n";
+                $"{dateOfNextMonday:D} 1:07:00 AM {nzTimeZoneName} ({expectedLocalTime:F} {localTimeZoneName})\r\n";
             Assert.AreEqual(expectedMessage, runMessage);
         }
 
@@ -151,10 +159,18 @@ namespace JobScheduler.Tests.QuartzExtensions
                 seedDate = seedDate.AddDays(1);
 
             var dateOfNextMonday = GetDateForNextDayOfWeek(seedDate, DayOfWeek.Monday);
-            bool isInDaylightSavingTime = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time").IsDaylightSavingTime(dateOfNextMonday);
-            var mode = isInDaylightSavingTime ? "Daylight" : "Standard";
+
+            var nzTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
+            var timeSpanDifference = nzTimeZoneInfo.BaseUtcOffset - TimeZoneInfo.Local.BaseUtcOffset;
+            var expectedLocalTime = dateOfNextMonday.AddHours(21).AddMinutes(23).Subtract(timeSpanDifference);
+
+            bool isInDaylightSavingTime = nzTimeZoneInfo.IsDaylightSavingTime(dateOfNextMonday);
+            var nzTimeZoneName = isInDaylightSavingTime ? nzTimeZoneInfo.DaylightName : nzTimeZoneInfo.StandardName;
+
+            bool isLocalInDaylightSavingTime = TimeZoneInfo.Local.IsDaylightSavingTime(dateOfNextMonday);
+            var localTimeZoneName = isLocalInDaylightSavingTime ? TimeZoneInfo.Local.DaylightName : TimeZoneInfo.Local.StandardName;
             var expectedMessage =
-                $"{dateOfNextMonday:D} 9:23:00 PM New Zealand {mode} Time ({dateOfNextMonday:D} 7:23:00 PM AUS Eastern {mode} Time)\r\n";
+                $"{dateOfNextMonday:D} 9:23:00 PM {nzTimeZoneName} ({expectedLocalTime:F} {localTimeZoneName})\r\n";
             Assert.AreEqual(expectedMessage, runMessage);
         }
 
