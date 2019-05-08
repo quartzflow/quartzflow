@@ -17,8 +17,7 @@ namespace JobSchedulerHost
                     s.ConstructUsing(() => new SchedulerHost());     
                     s.WhenStarted(tc => tc.Start());              
                     s.WhenStopped(tc => tc.Stop());               
-                });
-                x.RunAsLocalSystem();                            
+                });                         
 
                 x.SetDescription("JobScheduler Host");        
                 x.SetDisplayName("JobScheduler Host");                       
