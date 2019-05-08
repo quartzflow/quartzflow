@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using JobScheduler.Jobs;
+using JobScheduler.QuartzExtensions;
 using NUnit.Framework;
 using Quartz;
 using Quartz.Impl;
@@ -53,7 +54,7 @@ namespace JobScheduler.Tests.Jobs
             var context = GetJobContext();
             _successJob.Execute(context);
 
-            string output = (string)context.Get(Constants.FieldNames.StandardOutput);
+            string output = context.ReadOutputBufferContents();
             Assert.That(output.Contains($"About to run {context.JobDetail.Key} at {DateTime.Now.ToString("dd/MM/yyyy")}"));
             Assert.That(output.Contains($"FileName: {_successJob.ExecutableName}, Parameters: {_successJob.Parameters}"));
             Assert.That(output.Contains("Sleeping for 1000 ms"));
@@ -69,7 +70,7 @@ namespace JobScheduler.Tests.Jobs
             var context = GetJobContext();
 
             var exception = Assert.Throws<JobExecutionException>(() => _failJob.Execute(context));
-            string output = (string)context.Get(Constants.FieldNames.StandardOutput);
+            string output = context.ReadOutputBufferContents();
             Assert.That(output.Contains($"About to run {context.JobDetail.Key} at {DateTime.Now.ToString("dd/MM/yyyy")}"));
             Assert.That(output.Contains($"FileName: {_failJob.ExecutableName}, Parameters: {_failJob.Parameters}"));
             Assert.That(output.Contains("Error executing job - The system cannot find the file specified"));
@@ -91,7 +92,10 @@ namespace JobScheduler.Tests.Jobs
             var context = GetJobContext(3);
 
             _failJob.Execute(context);
+
             Assert.AreEqual(JobExecutionStatus.Failed, context.Result);
+            string output = context.ReadOutputBufferContents();
+            Assert.That(output.Contains($"No more retries available for job {context.JobDetail.Key}.  Setting status to Failed."));
         }
 
         [Test]
@@ -111,6 +115,8 @@ namespace JobScheduler.Tests.Jobs
 
             _errorExitCodeJob.Execute(context);
             Assert.AreEqual(JobExecutionStatus.Failed, context.Result);
+            string output = context.ReadOutputBufferContents();
+            Assert.That(output.Contains($"No more retries available for job {context.JobDetail.Key}.  Setting status to Failed."));
         }
 
         private void SetupSuccessJob()

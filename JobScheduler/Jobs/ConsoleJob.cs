@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using JobScheduler.QuartzExtensions;
 using Quartz;
 
 namespace JobScheduler.Jobs
@@ -25,10 +26,11 @@ namespace JobScheduler.Jobs
                 JobKey key = context.JobDetail.Key;
                 _jobKey = key.ToString();
                 JobDataMap dataMap = context.MergedJobDataMap;
+                context.ClearOutputBuffer();
 
                 if ((context.RefireCount > 0) && (context.RefireCount > MaxRetries))
                 {
-                    _output += $"No more retries available for job {key}.  Setting status to Failed.{Environment.NewLine}";
+                    WriteImmediatelyToOutputLog(context, $"No more retries available for job {key}.  Setting status to Failed.");
                     context.Result = JobExecutionStatus.Failed;
                 }
                 else
@@ -47,16 +49,16 @@ namespace JobScheduler.Jobs
                         EnableRaisingEvents = true,
                     };
 
-                    _output += "--------------------------------------------------------------------------";
-                    _output += $"Attempt {context.RefireCount+1} of {MaxRetries+1}: About to run {key} at {DateTime.Now:dd/MM/yyyy HH:mm:ss.fff}{Environment.NewLine}";
-                    _output += $"FileName: {ExecutableName}, Parameters: {Parameters}{Environment.NewLine}";
+                    WriteImmediatelyToOutputLog(context, "--------------------------------------------------------------------------");
+                    WriteImmediatelyToOutputLog(context, $"Attempt {context.RefireCount+1} of {MaxRetries+1}: About to run {key} at {DateTime.Now:dd/MM/yyyy HH:mm:ss.fff}");
+                    WriteImmediatelyToOutputLog(context, $"FileName: {ExecutableName}, Parameters: {Parameters}");
 
                     consoleRunner.Exited += ConsoleRunner_Exited;
 
                     consoleRunner.Start();
 
                     context.Put(Constants.FieldNames.ProcessId, consoleRunner.Id);
-                    _output += consoleRunner.StandardOutput.ReadToEnd();
+                    WriteImmediatelyToOutputLog(context, consoleRunner.StandardOutput.ReadToEnd());
 
                     consoleRunner.WaitForExit();
 
@@ -80,7 +82,7 @@ namespace JobScheduler.Jobs
 
                 if (retry)
                 {
-                    _output += $"Error executing job - {ex.Message}{Environment.NewLine}{ex.StackTrace}{Environment.NewLine}";
+                    WriteImmediatelyToOutputLog(context, $"Error executing job - {ex.Message}{Environment.NewLine}{ex.StackTrace}");
                     context.Result = JobExecutionStatus.Retrying;
                 }
                 else
@@ -92,9 +94,11 @@ namespace JobScheduler.Jobs
             }
             finally
             {
-                File.AppendAllText(OutputFile, _output);
-                context.Put(Constants.FieldNames.StandardOutput, _output);  
-                _output = String.Empty;
+                if (GetOutputBufferContents().Length > 0)
+                {
+                    WriteImmediatelyToOutputLog(context, GetOutputBufferContents());
+                    ClearOutputBuffer();
+                }
             }
         }
 
@@ -104,8 +108,28 @@ namespace JobScheduler.Jobs
 
             if (job.ExitCode != 0)
             {
-                _output += $"Exit event: Job {_jobKey} exited at {job.ExitTime.ToLongTimeString()} with an exit code of {job.ExitCode} {Environment.NewLine}";
+                WriteToOutputBuffer($"Exit event: Job {_jobKey} exited at {job.ExitTime.ToLongTimeString()} with an exit code of {job.ExitCode}");
             }
+        }
+        private void WriteImmediatelyToOutputLog(IJobExecutionContext context, string s)
+        {
+            File.AppendAllText(OutputFile, s + Environment.NewLine);
+            context.AppendToOutputBuffer(s);
+        }
+
+        private void WriteToOutputBuffer(string s)
+        {
+            _output += s;
+        }
+
+        private string GetOutputBufferContents()
+        {
+            return _output ?? string.Empty;
+        }
+
+        private void ClearOutputBuffer()
+        {
+            _output = string.Empty;
         }
     }
 }

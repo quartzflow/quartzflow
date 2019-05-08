@@ -180,6 +180,7 @@ namespace JobSchedulerHost.HttpApi
 
             if (targetJob != null)
             {
+                targetJob.AppendToOutputBuffer($"About to terminate Job {jobName} manually via API at {DateTime.Now.ToLongTimeString()}");
                 _scheduler.KillJob(targetJob, _processManager);
                 return true;
             }

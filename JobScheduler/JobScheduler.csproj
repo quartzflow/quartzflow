@@ -69,6 +69,7 @@
     <Compile Include="Listeners\ConditionalJobChainingListener.cs" />
     <Compile Include="ProcessManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuartzExtensions\JobExecutionContentExtensions.cs" />
     <Compile Include="QuartzExtensions\JobExtensions.cs" />
     <Compile Include="QuartzExtensions\SchedulerExtensions.cs" />
     <Compile Include="Configuration\RunOn.cs" />
