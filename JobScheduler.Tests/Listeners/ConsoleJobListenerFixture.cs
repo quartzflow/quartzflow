@@ -74,7 +74,7 @@ namespace JobScheduler.Tests.Listeners
         {
             var programOutput = "Some program output";
 
-            _context.Expect(c => c.Get("Output")).Return(programOutput);
+            _context.Expect(c => c.Get(Constants.FieldNames.StandardOutput)).Return(programOutput);
 
             _listener.JobWasExecuted(_context, null);
 

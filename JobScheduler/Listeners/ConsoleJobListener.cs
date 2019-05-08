@@ -17,7 +17,7 @@ namespace JobScheduler.Listeners
 
         public override void JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException)
         {
-            Log.Info("In Listener: " + context.Get("Output"));
+            Log.Info("In Listener: " + context.Get(Constants.FieldNames.StandardOutput));
             Log.Info("---------------------");
         }
 
