@@ -2,7 +2,7 @@
 using Quartz;
 using Quartz.Impl.Calendar;
 
-namespace JobScheduler.Calendars
+namespace QuartzFlow.Calendars
 {
     public class CustomCalendarFactory
     {

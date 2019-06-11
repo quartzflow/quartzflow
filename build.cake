@@ -8,15 +8,15 @@ Task("Default")
 Task("Build")
   .Does(() =>
 {
-  MSBuild("./JobScheduler.sln");
+  MSBuild("./QuartzFlow.sln");
 });
 
 Task("Test")
     .IsDependentOn("Build")
     .Does(() =>
     {
-        NUnit3("./JobScheduler.Tests/bin/Debug/JobScheduler.Tests.dll");
-		NUnit3("./JobSchedulerHost.Tests/bin/Debug/JobSchedulerHost.Tests.dll");
+        NUnit3("./JobScheduler.Tests/bin/Debug/QuartzFlow.Tests.dll");
+		NUnit3("./JobSchedulerHost.Tests/bin/Debug/QuartzFlowHost.Tests.dll");
     });
 
 RunTarget(target);

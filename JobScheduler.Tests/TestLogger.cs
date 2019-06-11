@@ -3,7 +3,7 @@ using Common.Logging;
 using Common.Logging.Simple;
 using NUnit.Framework;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     public class TestLogger
     {

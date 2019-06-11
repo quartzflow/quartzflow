@@ -2,7 +2,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     [TestFixture()]
     public class JobConfigFixture

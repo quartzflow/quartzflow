@@ -1,6 +1,6 @@
-﻿# JobScheduler
+﻿# QuartzFlow
 
-JobScheduler is a scheduling tool entirely based on Quartz.NET that is intended to execute applications on Windows and provide the following capabilities in some manner
+QuartzFlow is a scheduling tool entirely based on Quartz.NET that is intended to execute applications on Windows and provide the following capabilities in some manner
 	* job chaining on success/failure/completion
 	* retries on failure
 	* exclusion calendars (to cater for holidays etc)
@@ -33,7 +33,7 @@ netsh http delete urlacl url=http://+:5000/
 
 ## Running the tests
 
-The JobScheduler unit tests exist in the JobScheduler.Tests project - currently must be executed via VS.NET
+The QuartzFlow unit tests exist in the QuartzFlow.Tests project - currently must be executed via VS.NET
 
 ## Deployment
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JobSchedulerHost.HttpApi
+namespace QuartzFlowHost.HttpApi
 {
     public class ActiveJobDetailsModel
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     [TestFixture]
     public class ScheduleStringHelperFixture

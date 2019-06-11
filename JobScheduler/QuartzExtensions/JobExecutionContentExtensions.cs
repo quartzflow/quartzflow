@@ -1,7 +1,7 @@
 ﻿using System;
 using Quartz;
 
-namespace JobScheduler.QuartzExtensions
+namespace QuartzFlow.QuartzExtensions
 {
     public static class JobExecutionContextExtensions
     {

@@ -6,10 +6,10 @@ using NUnit.Framework;
 using Quartz;
 using Rhino.Mocks;
 using System.Threading;
-using JobScheduler.Calendars;
-using JobScheduler.Listeners;
+using QuartzFlow.Calendars;
+using QuartzFlow.Listeners;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     [TestFixture]
     public class ConductorFixture

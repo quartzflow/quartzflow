@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JobScheduler.Calendars;
+using QuartzFlow.Calendars;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using Quartz.Impl.Calendar;
 
-namespace JobScheduler.Tests.Calendars
+namespace QuartzFlow.Tests.Calendars
 {
     [TestFixture()]
     public class CustomCalendarFactoryFixture

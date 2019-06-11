@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using JobScheduler.Jobs;
-using JobScheduler.QuartzExtensions;
+using QuartzFlow.Jobs;
+using QuartzFlow.QuartzExtensions;
 using NUnit.Framework;
 using Quartz;
 using Quartz.Impl;
 
-namespace JobScheduler.Tests.Jobs
+namespace QuartzFlow.Tests.Jobs
 {
     [TestFixture]
     public class ConsoleJobFixture

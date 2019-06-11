@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using NUnit.Framework;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     [TestFixture()]
     public class ProcessManagerFixture

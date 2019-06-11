@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CsQuery.Utility;
-using JobSchedulerHost.HttpApi;
+using QuartzFlowHost.HttpApi;
 using Nancy;
 using Nancy.Testing;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Browser = Nancy.Testing.Browser;
 
-namespace JobSchedulerHost.Tests.HttpApi
+namespace QuartzFlowHost.Tests.HttpApi
 {
     [TestFixture]
     public class SchedulerModuleFixture
@@ -277,7 +277,7 @@ namespace JobSchedulerHost.Tests.HttpApi
             });
 
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            Assert.IsTrue(result.Body.AsString().StartsWith("JobScheduler REST API \r\n\r\nBase URL: /scheduler"));
+            Assert.IsTrue(result.Body.AsString().StartsWith("QuartzFlow REST API \r\n\r\nBase URL: /scheduler"));
         }
 
         private BrowserResponse SendJobActionRequest(int jobId, string action)

@@ -7,7 +7,7 @@ using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses;
 
-namespace JobSchedulerHost.HttpApi
+namespace QuartzFlowHost.HttpApi
 {
     public class SchedulerModule : NancyModule
     {

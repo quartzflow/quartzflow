@@ -1,4 +1,4 @@
-﻿namespace JobSchedulerHost.HttpApi
+﻿namespace QuartzFlowHost.HttpApi
 {
     public class SearchCriteriaModel
     {

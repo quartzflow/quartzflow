@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
-using JobScheduler.Listeners;
+using QuartzFlow.Listeners;
 using Quartz;
 using Rhino.Mocks;
 using Common.Logging;
 
-namespace JobScheduler.Tests.Listeners
+namespace QuartzFlow.Tests.Listeners
 {
     [TestFixture()]
     public class ConditionalJobChainingListenerFixture

@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using Common.Logging;
-using JobScheduler;
-using JobScheduler.Calendars;
-using JobSchedulerHost.HttpApi;
+using QuartzFlow;
+using QuartzFlow.Calendars;
+using QuartzFlowHost.HttpApi;
 using Microsoft.Owin.Hosting;
 using LogManager = Common.Logging.LogManager;
 
-namespace JobSchedulerHost
+namespace QuartzFlowHost
 {
     public class SchedulerHost
     {

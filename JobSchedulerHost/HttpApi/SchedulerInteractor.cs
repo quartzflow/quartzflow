@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JobScheduler;
-using JobScheduler.QuartzExtensions;
+using QuartzFlow;
+using QuartzFlow.QuartzExtensions;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
 
-namespace JobSchedulerHost.HttpApi
+namespace QuartzFlowHost.HttpApi
 {
     public interface ISchedulerInteractor
     {

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Configuration;
 
-namespace JobScheduler
+namespace QuartzFlow
 {
     public static class SchedulerConfig
     {

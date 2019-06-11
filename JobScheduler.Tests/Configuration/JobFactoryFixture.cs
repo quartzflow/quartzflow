@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using JobScheduler.Jobs;
+using QuartzFlow.Jobs;
 using NUnit.Framework;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     [TestFixture()]
     public class JobFactoryFixture

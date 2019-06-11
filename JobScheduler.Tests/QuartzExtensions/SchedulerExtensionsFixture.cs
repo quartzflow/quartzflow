@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using JobScheduler.QuartzExtensions;
+using QuartzFlow.QuartzExtensions;
 using NUnit.Framework;
 using Quartz;
 using Quartz.Impl;
 
-namespace JobScheduler.Tests.QuartzExtensions
+namespace QuartzFlow.Tests.QuartzExtensions
 {
     [TestFixture]
     public class SchedulerExtensionsFixture

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using JobScheduler.Calendars;
+using QuartzFlow.Calendars;
 using NUnit.Framework;
 
-namespace JobScheduler.Tests.Calendars
+namespace QuartzFlow.Tests.Calendars
 {
     [TestFixture()]
     public class CustomCalendarConfigFixture

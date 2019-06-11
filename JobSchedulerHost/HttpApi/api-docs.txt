@@ -1,4 +1,4 @@
-﻿JobScheduler REST API 
+﻿QuartzFlow REST API 
 
 Base URL: /scheduler
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JobScheduler
+namespace QuartzFlow
 {
     public class JobIdentifier : IEquatable<JobIdentifier>
     {

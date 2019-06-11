@@ -7,8 +7,8 @@
     <ProjectGuid>{F034DE80-CE53-4ED6-9977-76BD6BFEFE92}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JobScheduler</RootNamespace>
-    <AssemblyName>JobScheduler</AssemblyName>
+    <RootNamespace>QuartzFlow</RootNamespace>
+    <AssemblyName>QuartzFlow</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

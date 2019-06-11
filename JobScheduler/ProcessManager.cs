@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace JobScheduler
+namespace QuartzFlow
 {
     public interface IProcessManager
     {

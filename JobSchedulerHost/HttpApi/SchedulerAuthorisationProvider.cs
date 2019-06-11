@@ -2,7 +2,7 @@
 using System.Security.Principal;
 using Nancy;
 
-namespace JobSchedulerHost.HttpApi
+namespace QuartzFlowHost.HttpApi
 {
     public interface ISchedulerAuthorisationProvider
     {

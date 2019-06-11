@@ -5,7 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Quartz.Util;
 
-namespace JobScheduler.Calendars
+namespace QuartzFlow.Calendars
 {
     public class CustomCalendarConfig
     {

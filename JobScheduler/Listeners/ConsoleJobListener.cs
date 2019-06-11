@@ -1,9 +1,9 @@
 ﻿using System;
-using JobScheduler.QuartzExtensions;
+using QuartzFlow.QuartzExtensions;
 using Quartz;
 using Quartz.Listener;
 
-namespace JobScheduler.Listeners
+namespace QuartzFlow.Listeners
 {
     public class ConsoleJobListener : JobListenerSupport
     {

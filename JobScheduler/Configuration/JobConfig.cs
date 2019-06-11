@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using Newtonsoft.Json;
 using Quartz.Util;
 
-namespace JobScheduler
+namespace QuartzFlow
 {
     public class JobConfig
     {

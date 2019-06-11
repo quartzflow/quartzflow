@@ -2,7 +2,7 @@
 using System.IO;
 using Topshelf;
 
-namespace JobSchedulerHost
+namespace QuartzFlowHost
 {
     public class Program
     {
@@ -19,9 +19,9 @@ namespace JobSchedulerHost
                     s.WhenStopped(tc => tc.Stop());               
                 });                         
 
-                x.SetDescription("JobScheduler Host");        
-                x.SetDisplayName("JobScheduler Host");                       
-                x.SetServiceName("JobSchedulerHost");                       
+                x.SetDescription("QuartzFlow Host");        
+                x.SetDisplayName("QuartzFlow Host");                       
+                x.SetServiceName("QuartzFlowHost");                       
             });
         }
 

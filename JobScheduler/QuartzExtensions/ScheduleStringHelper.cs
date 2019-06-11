@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace JobScheduler
+namespace QuartzFlow
 {
     public class ScheduleStringHelper
     {

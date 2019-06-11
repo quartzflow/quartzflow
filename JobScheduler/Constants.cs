@@ -1,4 +1,4 @@
-﻿namespace JobScheduler
+﻿namespace QuartzFlow
 {
     public class Constants
     {

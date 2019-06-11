@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace JobSchedulerHost.HttpApi
+namespace QuartzFlowHost.HttpApi
 {
     public class JobDetailsModel
     {

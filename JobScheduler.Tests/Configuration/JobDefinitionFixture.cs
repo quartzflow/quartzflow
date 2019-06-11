@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Newtonsoft.Json;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     [TestFixture]
     public class JobDefinitionFixture

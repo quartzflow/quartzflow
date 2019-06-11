@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
-using JobScheduler.QuartzExtensions;
+using QuartzFlow.QuartzExtensions;
 using NUnit.Framework;
 using Quartz.Impl;
 using Quartz.Impl.Triggers;
 
-namespace JobScheduler.Tests.QuartzExtensions
+namespace QuartzFlow.Tests.QuartzExtensions
 {
     [TestFixture]
     public class JobExtensionsFixture

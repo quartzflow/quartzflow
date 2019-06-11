@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Quartz;
 using Quartz.Listener;
 
-namespace JobScheduler.Listeners
+namespace QuartzFlow.Listeners
 {
     public enum JobResultCriteria
     {

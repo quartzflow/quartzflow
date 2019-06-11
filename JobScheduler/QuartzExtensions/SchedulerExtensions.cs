@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Common.Logging;
-using JobScheduler.Listeners;
+using QuartzFlow.Listeners;
 using Quartz;
 using Quartz.Impl.Matchers;
 
-namespace JobScheduler.QuartzExtensions 
+namespace QuartzFlow.QuartzExtensions 
 {
     public static class SchedulerExtensions
     {

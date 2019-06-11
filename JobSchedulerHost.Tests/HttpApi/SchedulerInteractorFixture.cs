@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using JobScheduler;
-using JobScheduler.QuartzExtensions;
-using JobSchedulerHost.HttpApi;
+using QuartzFlow;
+using QuartzFlow.QuartzExtensions;
+using QuartzFlowHost.HttpApi;
 using NUnit.Framework;
 using Quartz;
 using Quartz.Impl;
@@ -12,7 +12,7 @@ using Quartz.Impl.Matchers;
 using Quartz.Job;
 using Rhino.Mocks;
 
-namespace JobSchedulerHost.Tests.HttpApi
+namespace QuartzFlowHost.Tests.HttpApi
 {
     [TestFixture()]
     public class SchedulerInteractorFixture

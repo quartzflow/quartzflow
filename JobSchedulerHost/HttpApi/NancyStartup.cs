@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Owin;
 
-namespace JobSchedulerHost.HttpApi
+namespace QuartzFlowHost.HttpApi
 {
     internal class NancyStartup
     {

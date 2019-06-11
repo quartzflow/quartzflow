@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using JobScheduler.QuartzExtensions;
+using QuartzFlow.QuartzExtensions;
 using Quartz;
 
-namespace JobScheduler.Jobs
+namespace QuartzFlow.Jobs
 {
     [PersistJobDataAfterExecution]  
     [DisallowConcurrentExecution]

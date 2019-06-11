@@ -7,8 +7,8 @@
     <ProjectGuid>{E42365F4-808A-445E-BDBE-74575B2AAD6C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JobSchedulerHost</RootNamespace>
-    <AssemblyName>JobSchedulerHost</AssemblyName>
+    <RootNamespace>QuartzFlowHost</RootNamespace>
+    <AssemblyName>QuartzFlowHost</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>JobSchedulerHost.Program</StartupObject>
+    <StartupObject>QuartzFlowHost.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Common.Logging, Version=3.4.1.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
@@ -116,9 +116,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JobScheduler\JobScheduler.csproj">
+    <ProjectReference Include="..\JobScheduler\QuartzFlow.csproj">
       <Project>{f034de80-ce53-4ed6-9977-76bd6bfefe92}</Project>
-      <Name>JobScheduler</Name>
+      <Name>QuartzFlow</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using Common.Logging;
-using JobScheduler.Listeners;
-using JobScheduler.QuartzExtensions;
+using QuartzFlow.Listeners;
+using QuartzFlow.QuartzExtensions;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
 using Timer = System.Timers.Timer;
 
-namespace JobScheduler
+namespace QuartzFlow
 {
     public class Conductor
     {

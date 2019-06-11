@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Quartz;
 
-namespace JobScheduler.Tests
+namespace QuartzFlow.Tests
 {
     public class TestHelper
     {

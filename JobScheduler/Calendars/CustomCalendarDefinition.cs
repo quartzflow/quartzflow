@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JobScheduler.Calendars
+namespace QuartzFlow.Calendars
 {
     public class CustomCalendarDefinition
     {

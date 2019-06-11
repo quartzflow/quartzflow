@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using JobScheduler.Jobs;
+using QuartzFlow.Jobs;
 using Quartz;
 
-namespace JobScheduler
+namespace QuartzFlow
 {
     public class JobFactory
     {
