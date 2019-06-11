@@ -11,7 +11,7 @@ namespace QuartzFlowHost.HttpApi
 {
     public class SchedulerModule : NancyModule
     {
-        public SchedulerModule(ISchedulerInteractor interactor, ISchedulerAuthorisationProvider authorisationProvider) : base("/scheduler")
+        public SchedulerModule(ISchedulerInteractor interactor, ISchedulerAuthorisationProvider authorisationProvider) : base("/quartzflow")
         {
             Before.AddItemToStartOfPipeline((ctx) =>
             {

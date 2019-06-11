@@ -1,6 +1,6 @@
 ﻿QuartzFlow REST API 
 
-Base URL: /scheduler
+Base URL: /quartzflow
 
 	GET /docs
 

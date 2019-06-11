@@ -44,7 +44,7 @@ namespace QuartzFlowHost.Tests.HttpApi
         {
             _interactor.Expect(i => i.GetStatus()).Return("started");
 
-            var result = _browser.Get("/scheduler/status", with => {
+            var result = _browser.Get("/quartzflow/status", with => {
                 with.HttpRequest();
             });
 
@@ -57,7 +57,7 @@ namespace QuartzFlowHost.Tests.HttpApi
         {
             _interactor.Expect(i => i.GetJobs()).Return(new List<JobDetailsModel> { new JobDetailsModel() { Name = "job1" }, new JobDetailsModel { Name = "job2" } });
 
-            var result = _browser.Get("/scheduler/jobs", with => {
+            var result = _browser.Get("/quartzflow/jobs", with => {
                 with.HttpRequest();
             });
 
@@ -74,7 +74,7 @@ namespace QuartzFlowHost.Tests.HttpApi
         {
             _interactor.Expect(i => i.GetCurrentlyExecutingJobs()).Return(new List<ActiveJobDetailsModel> { new ActiveJobDetailsModel { Id = 1, Name = "job1" }, new ActiveJobDetailsModel { Id = 2, Name = "job2" } });
 
-            var result = _browser.Get("/scheduler/jobs", with => {
+            var result = _browser.Get("/quartzflow/jobs", with => {
                 with.HttpRequest();
                 with.Query("criteria", "executing");
             });
@@ -93,7 +93,7 @@ namespace QuartzFlowHost.Tests.HttpApi
             _interactor.Expect(i => i.GetJobs()).Return(null).Repeat.Never();
             _interactor.Expect(i => i.GetCurrentlyExecutingJobs()).Return(null).Repeat.Never();
 
-            var result = _browser.Get("/scheduler/jobs", with => {
+            var result = _browser.Get("/quartzflow/jobs", with => {
                 with.HttpRequest();
                 with.Query("criteria", "gibberish");
             });
@@ -111,7 +111,7 @@ namespace QuartzFlowHost.Tests.HttpApi
             _interactor.Expect(i => i.GetJobDetails("job1"))
                         .Return(new JobDetailsModel() {Description = "something", Name = "job1", NextRunAt = "blah", Properties = props });
 
-            var result = _browser.Get("/scheduler/jobs/1", with => {
+            var result = _browser.Get("/quartzflow/jobs/1", with => {
                 with.HttpRequest();
             });
 
@@ -131,7 +131,7 @@ namespace QuartzFlowHost.Tests.HttpApi
             _interactor.Expect(i => i.GetJobNameById(1)).Return(null);
             _interactor.Expect(i => i.GetJobDetails("job1")).Return(null).Repeat.Never();
 
-            var result = _browser.Get("/scheduler/jobs/1", with => {
+            var result = _browser.Get("/quartzflow/jobs/1", with => {
                 with.HttpRequest();
             });
 
@@ -272,17 +272,17 @@ namespace QuartzFlowHost.Tests.HttpApi
         [Test]
         public void Get_Docs_ReturnsResultAndOK()
         {
-            var result = _browser.Get("/scheduler/docs", with => {
+            var result = _browser.Get("/quartzflow/docs", with => {
                 with.HttpRequest();
             });
 
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);
-            Assert.IsTrue(result.Body.AsString().StartsWith("QuartzFlow REST API \r\n\r\nBase URL: /scheduler"));
+            Assert.IsTrue(result.Body.AsString().StartsWith("QuartzFlow REST API \r\n\r\nBase URL: /quartzflow"));
         }
 
         private BrowserResponse SendJobActionRequest(int jobId, string action)
         {
-            var result = _browser.Put($"/scheduler/jobs/{jobId}", with =>
+            var result = _browser.Put($"/quartzflow/jobs/{jobId}", with =>
             {
                 with.HttpRequest();
                 with.FormValue(HttpApiConstants.FormFieldNames.ActionToTake, action);
@@ -292,7 +292,7 @@ namespace QuartzFlowHost.Tests.HttpApi
 
         private BrowserResponse SendJobActionRequest(string action)
         {
-            var result = _browser.Put($"/scheduler/jobs", with =>
+            var result = _browser.Put($"/quartzflow/jobs", with =>
             {
                 with.HttpRequest();
                 with.FormValue(HttpApiConstants.FormFieldNames.ActionToTake, action);

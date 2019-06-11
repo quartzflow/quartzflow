@@ -12,7 +12,7 @@
             "Timezone": "",
             "ExclusionCalendar": "AU_Public_Holidays"
         },
-        "ExecutableName": "D:\\Source\\JobScheduler\\JobScheduler\\TestApp\\bin\\Debug\\TestApp.exe",
+        "ExecutableName": "D:\\Source\\QuartzFlow\\QuartzFlow\\TestApp\\bin\\Debug\\TestApp.exe",
         "Parameters": "success 300",
         "Retries": 3,
         "WarnAfter": 1,
@@ -22,20 +22,26 @@
         "JobName": "Job2",
         "Description": "",
         "Group": "",
-        "ExecutableName": "D:\\Source\\JobScheduler\\JobScheduler\\TestApp\\bin\\Debug\\TestApp.exe",
+        "ExecutableName": "D:\\Source\\QuartzFlow\\QuartzFlow\\TestApp\\bin\\Debug\\TestApp.exe",
         "Parameters": "failure 1000",
         "RunOnSuccessOf": "",
         "RunOnFailureOf": "",
-        "RunOnCompletionOf": { "Group": "SOD", "JobName": "Job1" },
+        "RunOnCompletionOf": {
+            "Group": "SOD",
+            "JobName": "Job1"
+        },
         "Retries": 1
     },
     {
         "JobName": "Job3",
-        "Description":  "",
+        "Description": "",
         "Group": "SOD",
-        "ExecutableName": "D:\\Source\\JobScheduler\\JobScheduler\\TestApp\\bin\\Debug\\TestApp.exe",
+        "ExecutableName": "D:\\Source\\QuartzFlow\\QuartzFlow\\TestApp\\bin\\Debug\\TestApp.exe",
         "Parameters": "success 1000",
-        "RunOnSuccessOf": { "Group": "SOD", "JobName": "Job2" },
+        "RunOnSuccessOf": {
+            "Group": "SOD",
+            "JobName": "Job2"
+        },
         "RunOnFailureOf": "",
         "RunOnCompletionOf": ""
     }
