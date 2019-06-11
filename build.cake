@@ -15,8 +15,8 @@ Task("Test")
     .IsDependentOn("Build")
     .Does(() =>
     {
-        NUnit3("./JobScheduler.Tests/bin/Debug/QuartzFlow.Tests.dll");
-		NUnit3("./JobSchedulerHost.Tests/bin/Debug/QuartzFlowHost.Tests.dll");
+        NUnit3("./QuartzFlow.Tests/bin/Debug/QuartzFlow.Tests.dll");
+		NUnit3("./QuartzFlowHost.Tests/bin/Debug/QuartzFlowHost.Tests.dll");
     });
 
 RunTarget(target);

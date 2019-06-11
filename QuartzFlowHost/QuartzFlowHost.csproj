@@ -116,7 +116,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JobScheduler\QuartzFlow.csproj">
+    <ProjectReference Include="..\QuartzFlow\QuartzFlow.csproj">
       <Project>{f034de80-ce53-4ed6-9977-76bd6bfefe92}</Project>
       <Name>QuartzFlow</Name>
     </ProjectReference>
