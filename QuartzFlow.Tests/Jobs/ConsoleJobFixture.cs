@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using QuartzFlow.Jobs;
 using QuartzFlow.QuartzExtensions;
 using NUnit.Framework;
@@ -193,12 +194,13 @@ namespace QuartzFlow.Tests.Jobs
         public JobDataMap MergedJobDataMap { get;  set; }
         public IJobDetail JobDetail { get;  set; }
         public IJob JobInstance { get; private set; }
-        public DateTimeOffset? FireTimeUtc { get; private set; }
+        public DateTimeOffset FireTimeUtc { get; private set; }
         public DateTimeOffset? ScheduledFireTimeUtc { get; private set; }
         public DateTimeOffset? PreviousFireTimeUtc { get; private set; }
         public DateTimeOffset? NextFireTimeUtc { get; private set; }
         public string FireInstanceId { get; private set; }
         public object Result { get; set; }
         public TimeSpan JobRunTime { get; private set; }
+        public CancellationToken CancellationToken { get; }
     }
 }

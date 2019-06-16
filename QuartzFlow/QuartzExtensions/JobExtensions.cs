@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Quartz;
 
 namespace QuartzFlow.QuartzExtensions
@@ -11,7 +12,7 @@ namespace QuartzFlow.QuartzExtensions
             return !string.IsNullOrEmpty(runAt);
         }
 
-        public static string GetNextRunAtMessages(this IJobDetail job, Quartz.Collection.HashSet<ITrigger> triggers)
+        public static string GetNextRunAtMessages(this IJobDetail job, HashSet<ITrigger> triggers)
         {
             string targetTimeZone = (string)job.JobDataMap[Constants.FieldNames.Timezone];
             TimeZoneInfo timezone = TimeZoneInfo.Local;
@@ -61,7 +62,7 @@ namespace QuartzFlow.QuartzExtensions
             return runPlan;
         }
 
-        public static Quartz.Collection.HashSet<ITrigger> CreateTriggers(this IJobDetail job)
+        public static HashSet<ITrigger> CreateTriggers(this IJobDetail job)
         {
             string runAt = (string)job.JobDataMap[Constants.FieldNames.RunAt];
             string runOnDays = (string)job.JobDataMap[Constants.FieldNames.RunDays];
@@ -69,7 +70,7 @@ namespace QuartzFlow.QuartzExtensions
             string excludeCalendar = (string)job.JobDataMap[Constants.FieldNames.ExclusionCalendar];
             string targetTimeZone = (string)job.JobDataMap[Constants.FieldNames.Timezone];
 
-            var triggers = new Quartz.Collection.HashSet<ITrigger>();
+            var triggers = new HashSet<ITrigger>();
             string[] runAtTimes = runAt.Split(',');
             int runAtIndex = 0;
             foreach (var runAtTime in runAtTimes)

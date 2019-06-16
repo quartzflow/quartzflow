@@ -115,7 +115,7 @@ namespace QuartzFlow.Tests.QuartzExtensions
             var job = TestHelper.CreateTestJob("Test", "01:07", "mon", null, "New Zealand Standard Time");
             var triggers = job.CreateTriggers();
 
-            var scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            var scheduler = StdSchedulerFactory.GetDefaultScheduler().Result;
             scheduler.ScheduleJob(job, triggers, true);
 
             var runMessage = job.GetNextRunAtMessages(triggers);
@@ -148,7 +148,7 @@ namespace QuartzFlow.Tests.QuartzExtensions
             var job = TestHelper.CreateTestJob("Test", "21:23", "mon", null, "New Zealand Standard Time");
             var triggers = job.CreateTriggers();
 
-            var scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            var scheduler = StdSchedulerFactory.GetDefaultScheduler().Result;
             scheduler.ScheduleJob(job, triggers, true);
 
             var runMessage = job.GetNextRunAtMessages(triggers);

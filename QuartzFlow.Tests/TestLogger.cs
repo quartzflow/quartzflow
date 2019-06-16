@@ -1,25 +1,24 @@
-﻿using System.Collections.Generic;
-using Common.Logging;
-using Common.Logging.Simple;
+﻿using System;
+using System.Collections.Generic;
+using NLog.Targets;
 using NUnit.Framework;
 
 namespace QuartzFlow.Tests
 {
     public class TestLogger
     {
-        private readonly CapturingLoggerFactoryAdapter _loggingAdapter;
+        private readonly MemoryTarget _loggingSink;
 
-        public CapturingLoggerFactoryAdapter LoggingAdapter => _loggingAdapter;
+        public MemoryTarget LoggingSink => _loggingSink;
 
         public TestLogger()
         {
-            _loggingAdapter = new CapturingLoggerFactoryAdapter();
-            _loggingAdapter.Clear();
+            _loggingSink = new MemoryTarget();
         }
 
-        public IList<CapturingLoggerEvent> GetLoggedMessages()
+        public IList<string> GetLoggedMessages()
         {
-            return _loggingAdapter.LoggerEvents;
+            return _loggingSink.Logs;
         }
 
         public void AssertInfoMessagesLogged(params string[] messages)
@@ -30,8 +29,8 @@ namespace QuartzFlow.Tests
             int i = 0;
             foreach (var loggedMessage in loggedMessages)
             {
-                Assert.AreEqual(LogLevel.Info, loggedMessage.Level);
-                Assert.AreEqual(messages[i++], loggedMessage.RenderedMessage);
+                //Assert.AreEqual(LogLevel.Info, loggedMessage.Level);
+                Assert.AreEqual(messages[i++], loggedMessage);
             }
         }
 
@@ -43,7 +42,7 @@ namespace QuartzFlow.Tests
 
         public void Clear()
         {
-            _loggingAdapter.Clear();
+            _loggingSink.Logs.Clear();
         }
     }
 }

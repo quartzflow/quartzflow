@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Common.Logging;
 using QuartzFlow;
 using QuartzFlow.Calendars;
 using QuartzFlowHost.HttpApi;
 using Microsoft.Owin.Hosting;
-using LogManager = Common.Logging.LogManager;
+using NLog;
 
 namespace QuartzFlowHost
 {
     public class SchedulerHost
     {
         private readonly Conductor _conductor;
-        private readonly ILog _logger;   
+        private readonly ILogger _logger;   
 
         public SchedulerHost()
         {
             try
             {
-                _logger = LogManager.GetLogger<SchedulerHost>();
+                _logger = LogManager.GetCurrentClassLogger();
                 var jobDefinitions = JobConfig.CreateJobDefinitions(SchedulerConfig.JobsFile);
                 var calendarDefinitions = CustomCalendarConfig.CreateCalendarDefinitions(SchedulerConfig.CalendarsFile);
                 var customCalendars = CustomCalendarFactory.CreateAnnualCalendarsWithSpecifiedDatesExcluded(calendarDefinitions);

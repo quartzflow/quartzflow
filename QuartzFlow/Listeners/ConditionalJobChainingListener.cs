@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using NLog.Fluent;
 using Quartz;
 using Quartz.Listener;
 
@@ -61,13 +64,13 @@ namespace QuartzFlow.Listeners
             _chainLinks.Add(new Tuple<JobKey, DependentJobDetails>(firstJob, new DependentJobDetails(firstJobResult, secondJob)));
         }
 
-        public override void JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException)
+        public override Task JobWasExecuted(IJobExecutionContext context, JobExecutionException jobException, CancellationToken cancellationToken = new CancellationToken())
         {
             var jobDependencies = _chainLinks.FindAll(l => Equals(l.Item1, context.JobDetail.Key));
 
             if (jobDependencies == null || jobDependencies.Count == 0)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             var predecessorJobStatus = (JobExecutionStatus)context.Result;
@@ -103,7 +106,9 @@ namespace QuartzFlow.Listeners
                         break;
                 }
             }
-            
+
+            return Task.CompletedTask;
+
         }
 
         private void TriggerDependentJob(IJobExecutionContext context, DependentJobDetails sj)
@@ -114,7 +119,7 @@ namespace QuartzFlow.Listeners
             }
             catch (SchedulerException se)
             {
-                Log.Error($"Error encountered triggering Job '{sj.DependentJobKey}'", se);
+                Log.Error().Message($"Error encountered triggering Job '{sj.DependentJobKey}'").Exception(se);
             }
         }
 

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Common.Logging;
+using NLog;
+using NLog.Fluent;
 using QuartzFlow.Listeners;
 using Quartz;
 using Quartz.Impl.Matchers;
@@ -19,7 +20,7 @@ namespace QuartzFlow.QuartzExtensions
             {
                 var triggers = job.CreateTriggers();
                 scheduler.ScheduleJob(job, triggers, true);
-                LogManager.GetLogger<IScheduler>().Info(job.GetNextRunAtMessages(triggers));
+                Log.Info(job.GetNextRunAtMessages(triggers));
             }
             else
             {
@@ -78,12 +79,12 @@ namespace QuartzFlow.QuartzExtensions
 
         public static string GetJobStatus(this IScheduler scheduler, IJobDetail job)
         {
-            IList<ITrigger> jobTriggers = scheduler.GetTriggersOfJob(job.Key);
+            var jobTriggers = scheduler.GetTriggersOfJob(job.Key).Result;
             var triggerStates = new List<TriggerState>();
 
             foreach (ITrigger trigger in jobTriggers)
             {
-                TriggerState state = scheduler.GetTriggerState(trigger.Key);
+                TriggerState state = scheduler.GetTriggerState(trigger.Key).Result;
                 triggerStates.Add(state);
             }
 

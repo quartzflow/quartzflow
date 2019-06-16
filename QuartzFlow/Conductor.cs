@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Timers;
-using Common.Logging;
 using QuartzFlow.Listeners;
 using QuartzFlow.QuartzExtensions;
 using Quartz;
@@ -18,7 +16,6 @@ namespace QuartzFlow
         private readonly Timer _warningTimer;
         private readonly Timer _terminationTimer;
         private readonly IProcessManager _processManager;
-        private readonly ILog _logger;
 
         public event EventHandler<List<string>> JobsStillExecutingWarning;
         public event EventHandler<List<string>> JobsTerminated;
@@ -28,7 +25,7 @@ namespace QuartzFlow
         public bool IsTerminationTimerRunning => _terminationTimer.Enabled;
 
         public Conductor(List<JobDefinition> jobDefinitions, List<ICalendar> calendars, double intervalToCheckForLongRunningJobsInMs, double intervalToCheckForJobsToTerminateInMs) : 
-            this(jobDefinitions, calendars, intervalToCheckForLongRunningJobsInMs, intervalToCheckForJobsToTerminateInMs, StdSchedulerFactory.GetDefaultScheduler(), new ProcessManager()) {}
+            this(jobDefinitions, calendars, intervalToCheckForLongRunningJobsInMs, intervalToCheckForJobsToTerminateInMs, StdSchedulerFactory.GetDefaultScheduler().Result, new ProcessManager()) {}
 
         public Conductor(List<JobDefinition> jobDefinitions, List<ICalendar> calendars, double intervalToCheckForLongRunningJobsInMs, double intervalToCheckForJobsToTerminateInMs, 
                             IScheduler scheduler, IProcessManager processManager)
@@ -48,8 +45,6 @@ namespace QuartzFlow
             calendars.ForEach(c => _scheduler.AddCalendar(c.Description, c, true, true));
 
             AddJobsToScheduler(jobDefinitions);
-
-            _logger = LogManager.GetLogger(GetType());
         }
 
         public void StartScheduler()
@@ -80,7 +75,7 @@ namespace QuartzFlow
 
             var currentTime = DateTime.UtcNow;
             var longRunningJobs = new List<string>();
-            var currentRunningJobs = _scheduler.GetCurrentlyExecutingJobs();
+            var currentRunningJobs = _scheduler.GetCurrentlyExecutingJobs().Result;
             foreach (var job in currentRunningJobs)
             {
                 bool alreadyWarned = job.Trigger.JobDataMap.GetBooleanValue(Constants.FieldNames.HasIssuedLongRunningWarning);
@@ -91,7 +86,7 @@ namespace QuartzFlow
 
                     if (minutesToWarnAfter > 0)
                     {
-                        var jobStartedAtUtc = job.FireTimeUtc.Value;
+                        var jobStartedAtUtc = job.FireTimeUtc;
                         double runTime = currentTime.Subtract(jobStartedAtUtc.DateTime).TotalMinutes;
                         if (runTime > minutesToWarnAfter)
                         {
@@ -123,18 +118,18 @@ namespace QuartzFlow
             var currentTime = DateTime.UtcNow;
 
             var terminatedJobs = new List<string>();
-            var currentRunningJobs = _scheduler.GetCurrentlyExecutingJobs();
+            var currentRunningJobs = _scheduler.GetCurrentlyExecutingJobs().Result;
             foreach (var job in currentRunningJobs)
             {
                 int minutesToTerminateAfter = job.MergedJobDataMap.GetIntValue(Constants.FieldNames.TerminateAfter);
 
                 if (minutesToTerminateAfter > 0)
                 {
-                    double runTime = currentTime.Subtract(job.FireTimeUtc.Value.DateTime).TotalMinutes;
+                    double runTime = currentTime.Subtract(job.FireTimeUtc.DateTime).TotalMinutes;
                     if (runTime > minutesToTerminateAfter)
                     {
                         _scheduler.KillJob(job, _processManager);
-                        terminatedJobs.Add($"Job {job.JobDetail.Key} was started at {job.FireTimeUtc.Value.ToLocalTime():G} and was killed after {runTime:F} minutes");
+                        terminatedJobs.Add($"Job {job.JobDetail.Key} was started at {job.FireTimeUtc.ToLocalTime():G} and was killed after {runTime:F} minutes");
                     }
                 }
             }

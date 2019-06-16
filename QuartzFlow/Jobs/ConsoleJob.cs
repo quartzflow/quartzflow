@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using QuartzFlow.QuartzExtensions;
 using Quartz;
+using System.Threading.Tasks;
 
 namespace QuartzFlow.Jobs
 {
@@ -19,7 +20,7 @@ namespace QuartzFlow.Jobs
         private string _output;
         private string _jobKey;
 
-        public void Execute(IJobExecutionContext context)
+        public Task Execute(IJobExecutionContext context)
         {
             try
             {
@@ -68,14 +69,16 @@ namespace QuartzFlow.Jobs
                         throw new Exception("Process returned an error code");
 
                 }
+
+                return Task.CompletedTask;
+
             }
             //Only JobExecutionExceptions are expected from jobs
             catch (Exception ex)
             {
                 bool retry = true;
 
-                var exception = ex as JobExecutionException;
-                if (exception != null)
+                if (ex is JobExecutionException exception)
                 {
                     retry = exception.RefireImmediately;
                 }
@@ -131,5 +134,6 @@ namespace QuartzFlow.Jobs
         {
             _output = string.Empty;
         }
+
     }
 }

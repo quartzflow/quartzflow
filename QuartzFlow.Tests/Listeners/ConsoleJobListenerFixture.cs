@@ -3,7 +3,7 @@ using NUnit.Framework;
 using QuartzFlow.Listeners;
 using Quartz;
 using Rhino.Mocks;
-using Common.Logging;
+using NLog.Config;
 
 namespace QuartzFlow.Tests.Listeners
 {
@@ -20,7 +20,7 @@ namespace QuartzFlow.Tests.Listeners
         public void Setup()
         {
             _testLogger = new TestLogger();
-            LogManager.Adapter = _testLogger.LoggingAdapter;
+            new LoggingConfiguration().AddTarget(_testLogger.LoggingSink);
             _listener = new ConsoleJobListener();
             _context = MockRepository.GenerateMock<IJobExecutionContext>();
             _scheduler = MockRepository.GenerateMock<IScheduler>();
@@ -79,8 +79,8 @@ namespace QuartzFlow.Tests.Listeners
             _listener.JobWasExecuted(_context, null);
 
             var messages = _testLogger.GetLoggedMessages();
-            Assert.AreEqual($"-----Execution log:\r\n{programOutput}", messages[0].RenderedMessage);
-            Assert.AreEqual("---------------------", messages[1].RenderedMessage);
+            Assert.AreEqual($"-----Execution log:\r\n{programOutput}", messages[0]);
+            Assert.AreEqual("---------------------", messages[1]);
         }
 
 

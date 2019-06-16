@@ -77,7 +77,7 @@ namespace QuartzFlow.Tests
         [Test]
         public void WarningTimerElapsed_ForNormalRunningJob_WillNotRaiseEvent()
         {
-            List<IJobExecutionContext> executingJobs = new List<IJobExecutionContext>();
+            var executingJobs = new List<IJobExecutionContext>();
 
             IJobExecutionContext jobContext1 = MockRepository.GenerateMock<IJobExecutionContext>();
             ITrigger trigger1 = MockRepository.GenerateMock<ITrigger>();
@@ -103,7 +103,7 @@ namespace QuartzFlow.Tests
         [Test]
         public void WarningTimerElapsed_ForLongRunningJob_WillRaiseEvent()
         {       
-            List<IJobExecutionContext> executingJobs = new List<IJobExecutionContext>();
+            var executingJobs = new List<IJobExecutionContext>();
 
             IJobExecutionContext jobContext1 = MockRepository.GenerateMock<IJobExecutionContext>();
             ITrigger trigger1 = MockRepository.GenerateMock<ITrigger>();
@@ -140,7 +140,7 @@ namespace QuartzFlow.Tests
         [Test]
         public void WarningTimerElapsed_IfAlreadyWarnedForLongRunningJob_WillNotRaiseEventAgain()
         {
-            List<IJobExecutionContext> executingJobs = new List<IJobExecutionContext>();
+            var executingJobs = new List<IJobExecutionContext>();
 
             IJobExecutionContext jobContext1 = MockRepository.GenerateMock<IJobExecutionContext>();
             ITrigger trigger1 = MockRepository.GenerateMock<ITrigger>();
@@ -172,7 +172,7 @@ namespace QuartzFlow.Tests
         [Test]
         public void TerminationTimerElapsed_ForNormalRunningJob_WillNotDoAnything()
         {
-            List<IJobExecutionContext> executingJobs = new List<IJobExecutionContext>();
+            var executingJobs = new List<IJobExecutionContext>();
 
             IJobExecutionContext jobContext1 = MockRepository.GenerateMock<IJobExecutionContext>();
             ConfigureMocksForNormalRunningJobForTerminationCheck(jobContext1);

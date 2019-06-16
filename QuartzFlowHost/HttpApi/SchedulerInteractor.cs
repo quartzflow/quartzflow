@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using QuartzFlow;
 using QuartzFlow.QuartzExtensions;
 using Quartz;
@@ -34,7 +35,7 @@ namespace QuartzFlowHost.HttpApi
 
         public SchedulerInteractor()
         {
-            _scheduler = StdSchedulerFactory.GetDefaultScheduler();
+            _scheduler = StdSchedulerFactory.GetDefaultScheduler().Result;
             _processManager = new ProcessManager();
         }
 
@@ -64,7 +65,7 @@ namespace QuartzFlowHost.HttpApi
         public List<JobDetailsModel> GetJobs()
         {
             var jobList = new List<JobDetailsModel>();
-            var allJobs = _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
+            var allJobs = _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()).Result;
             if (allJobs != null && allJobs.Count > 0)
             {
                 foreach (var job in allJobs)
@@ -78,12 +79,12 @@ namespace QuartzFlowHost.HttpApi
         public List<ActiveJobDetailsModel> GetCurrentlyExecutingJobs()
         {
             var activeJobList = new List<ActiveJobDetailsModel>();
-            var executingJobs = _scheduler.GetCurrentlyExecutingJobs();
+            var executingJobs = _scheduler.GetCurrentlyExecutingJobs().Result;
             if (executingJobs != null && executingJobs.Count > 0)
             {
                 foreach (var jobExecutionContext in executingJobs)
                 {
-                    TimeSpan jobRunTime = DateTime.UtcNow.Subtract(jobExecutionContext.FireTimeUtc.Value.DateTime);
+                    TimeSpan jobRunTime = DateTime.UtcNow.Subtract(jobExecutionContext.FireTimeUtc.DateTime);
                     //jobDetails.Add($"Job {jobExecutionContext.JobDetail.Key} was started at {jobExecutionContext.FireTimeUtc.Value.LocalDateTime} and has been running for {jobRunTime.TotalMinutes:0.00} minutes");
       
                     var activeJobDetails = new ActiveJobDetailsModel()
@@ -91,7 +92,7 @@ namespace QuartzFlowHost.HttpApi
                         Id = jobExecutionContext.JobDetail.JobDataMap.GetInt(Constants.FieldNames.JobId),
                         Name = jobExecutionContext.JobDetail.Key.ToString(),
                         Description = jobExecutionContext.JobDetail.Description,
-                        StartedAt = jobExecutionContext.FireTimeUtc.Value.LocalDateTime,
+                        StartedAt = jobExecutionContext.FireTimeUtc.LocalDateTime,
                         MinutesExecutingFor = jobRunTime.TotalMinutes,
                         RetryCount = jobExecutionContext.RefireCount
                     };
@@ -108,7 +109,7 @@ namespace QuartzFlowHost.HttpApi
         {
             var key = GetJobKey(jobName);
 
-            var job =_scheduler.GetJobDetail(key);
+            var job =_scheduler.GetJobDetail(key).Result;
 
             if (job == null)
                 return null;
@@ -119,14 +120,14 @@ namespace QuartzFlowHost.HttpApi
                 props.Add(keyValuePair.Key, keyValuePair.Value?.ToString() ?? string.Empty);
             }
 
-            IList<ITrigger> jobTriggers = _scheduler.GetTriggersOfJob(job.Key);
+            var jobTriggers = _scheduler.GetTriggersOfJob(job.Key).Result;
 
             var result = new JobDetailsModel()
             {
                 Id = job.JobDataMap.GetInt(Constants.FieldNames.JobId),
                 Name = job.Key.ToString(),
                 Description = job.Description,
-                NextRunAt = job.GetNextRunAtMessages(new Quartz.Collection.HashSet<ITrigger>(jobTriggers)),
+                NextRunAt = job.GetNextRunAtMessages(new HashSet<ITrigger>(jobTriggers)),
                 Status = _scheduler.GetJobStatus(job),
                 Properties = props
             };
@@ -136,11 +137,11 @@ namespace QuartzFlowHost.HttpApi
 
         public string GetJobNameById(int jobId)
         {
-            var keys = _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup());
+            var keys = _scheduler.GetJobKeys(GroupMatcher<JobKey>.AnyGroup()).Result;
 
             foreach(var key in keys)
             {
-                var job = _scheduler.GetJobDetail(key);
+                var job = _scheduler.GetJobDetail(key).Result;
                 if (job.JobDataMap.GetInt(Constants.FieldNames.JobId) == jobId)
                     return key.ToString();
             }
@@ -150,7 +151,7 @@ namespace QuartzFlowHost.HttpApi
 
         public bool JobExists(string jobName)
         {
-            return _scheduler.CheckExists(GetJobKey(jobName));
+            return _scheduler.CheckExists(GetJobKey(jobName)).Result;
         }
 
         public void PauseJob(string jobName)
@@ -175,7 +176,7 @@ namespace QuartzFlowHost.HttpApi
 
         public bool KillJob(string jobName)
         {
-            var currentlyExecutingJobs = _scheduler.GetCurrentlyExecutingJobs();
+            var currentlyExecutingJobs = _scheduler.GetCurrentlyExecutingJobs().Result;
             var targetJob = currentlyExecutingJobs.FirstOrDefault(j => j.JobDetail.Key.ToString() == jobName);
 
             if (targetJob != null)
