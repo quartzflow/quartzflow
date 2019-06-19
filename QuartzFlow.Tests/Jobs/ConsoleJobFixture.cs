@@ -36,6 +36,7 @@ namespace QuartzFlow.Tests.Jobs
         }
 
         [Test]
+        [Category("ExternalProcessIntegration")]
         public void Execute_WithValidParameters_WillRunJobAndWaitForCompletion()
         {
             var context = GetJobContext();
@@ -49,6 +50,7 @@ namespace QuartzFlow.Tests.Jobs
         }
 
         [Test]
+        [Category("ExternalProcessIntegration")]
         public void Execute_WithValidParameters_WillRunJobAndCaptureStandardOutputResults()
         {
             var context = GetJobContext();
@@ -99,6 +101,7 @@ namespace QuartzFlow.Tests.Jobs
         }
 
         [Test]
+        [Category("ExternalProcessIntegration")]
         public void Execute_OnErrorExitCodeAndWithinRetryAttempts_WillSetupForRetry()
         {
             var context = GetJobContext();
@@ -109,6 +112,7 @@ namespace QuartzFlow.Tests.Jobs
         }
 
         [Test]
+        [Category("ExternalProcessIntegration")]
         public void Execute_OnErrorExitCodeAndAfterMaxRetriesExceeded_WillThrowExceptionAndFail()
         {
             var context = GetJobContext(3);
